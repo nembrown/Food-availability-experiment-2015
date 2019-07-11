@@ -1,0 +1,24 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.pdf
+*.csv
+*.xlsx
+*.xls
+*.doc
+*.docx
+*.ppt
+*.pptx
+*.pptm
+*.png
+*.tif
+**/Data
+**/Cassandra nudibranchs
+**/Powerpoints
+**/Norah DIC 2015
+**/Statistical Results tables
+**/Write ups
+**/R output files
+**/Old scripts
+
