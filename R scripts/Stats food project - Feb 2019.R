@@ -1,10 +1,7 @@
+setwd("C:/Users/Norah/Dropbox/Projects/Food-availability-experiment-2015/Data")
+
 
 # read in useful packages
-setwd("C:/Users/norahbrown/Dropbox/Projects/Summer 2015 food availability experiments/Data")
-
-
-
-
 
 library(tidyr)
 library(bbmle) 
@@ -49,15 +46,15 @@ library(cowplot)
 
 # dataframe management ----------------------------------------------------
 
-
-head(food.exp.data.12.2019)
 food.exp.data.12.2019<-read.csv("C:Mesocosm inventory data//food.exp.data.mesocosm.12.csv")
 food.exp.data.tile.all<-read.csv("C:Mesocosm inventory data//food.exp.data.tile.all.csv")
 food.caprellid.data<-read.csv("c:Emily caprellid data.csv", stringsAsFactors = FALSE, na.strings = c("NA","") )
 
+#ordered and unordered factors
 food.exp.data.12.2019$oFood.quality<-factor(food.exp.data.12.2019$Food.quality, levels=c("None", "Low", "High"), ordered=TRUE)
 food.exp.data.12.2019$Food.quality<-factor(food.exp.data.12.2019$Food.quality, levels=c("None", "Low", "High"), ordered=FALSE)
 
+#some variables need to be read over
 food.exp.data.12.2019$caprellid.percent<-food.exp.data.tile.all$caprellid
 food.exp.data.12.2019$hydroid<-food.exp.data.tile.all$hydroid
 food.exp.data.12.2019$alive.bot<-food.exp.data.tile.all$alive.bot
@@ -79,17 +76,19 @@ food.exp.data.12.2019$tunicate_dry_biomass<-food.exp.data.tile.all$tunicate_dry_
 food.exp.data.12.2019$hydtobot<-(food.exp.data.12.2019$alive.bot)/(food.exp.data.12.2019$alive.bot+food.exp.data.12.2019$hydroid)
 food.exp.data.12.2019$rest_dry_biomass<-food.exp.data.tile.all$rest_dry_biomass
 
+#small negative biomass is within error of scale - change to zero
 food.exp.data.12.2019$hydroid_dry_biomass[food.exp.data.12.2019$hydroid_dry_biomass<0]<-0
 food.exp.data.12.2019$tunicate_dry_biomass[food.exp.data.12.2019$tunicate_dry_biomass<0]<-0
 food.exp.data.12.2019$hydtobot_dry_biomass<-(food.exp.data.12.2019$tunicate_dry_biomass)/(food.exp.data.12.2019$tunicate_dry_biomass+food.exp.data.12.2019$hydroid_dry_biomass)
 
-
+#read in community data from other file
 food.exp.data.12.2019$CAP1<-model.meso.bray.scores$CAP1
 food.exp.data.12.2019$distances<-bd.bray$distances
 
 food.exp.data.12.2019$Mussel.wet.weight.per.1<-(food.exp.data.12.2019$Mussel.wet.weight)/(food.exp.data.12.2019$mussel_complete+1)
 
-
+#making it a proportion instead of % cover
+food.exp.data.12.2019$caprellid.percent.001<-0.01*(food.exp.data.12.2019$caprellid.percent)
 food.exp.data.12.2019$hydroid.001<-0.01*(food.exp.data.12.2019$hydroid)
 food.exp.data.12.2019$alive.bot.001<-0.01*(food.exp.data.12.2019$alive.bot)
 food.exp.data.12.2019$alive.mem.001<-0.01*(food.exp.data.12.2019$alive.mem)
@@ -448,7 +447,7 @@ plt.gam.hydroid <- ggplot(ndata.hydroid, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.hydroid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.gam.hydroid 
-ggsave("C:Graphs May 2019//hydroid_pred.png")
+ggsave("C:Graphs July 2019//hydroid_pred.png")
 
 head(ndata.hydroid)
 
@@ -524,7 +523,7 @@ plt.alive.bot <- ggplot(ndata.alive.bot, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.alive.bot,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.alive.bot
-ggsave("C:Graphs May 2019//alive.bot_pred.png")
+ggsave("C:Graphs July 2019//alive.bot_pred.png")
 
 
 
@@ -615,7 +614,7 @@ plt.caprellid <- ggplot(ndata.caprellid, aes(x = min.10.pH.unscaled, y = fit)) +
   theme(legend.position="none")
 plt.caprellid
 
-ggsave("C:Graphs May 2019//caprellid_pred.png")
+ggsave("C:Graphs July 2019//caprellid_pred.png")
 
 
 # GAM caprellid percent -----------------------------------------------------------
@@ -697,7 +696,7 @@ plt.caprellid.percent <- ggplot(ndata.caprellid.percent, aes(x = min.10.pH.unsca
   geom_ribbon(data = ndata.caprellid.percent,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.caprellid.percent
-ggsave("C:Graphs May 2019//caprellid.percent_pred.png")
+ggsave("C:Graphs July 2019//caprellid.percent_pred.png")
 
 
 
@@ -784,7 +783,7 @@ plt.formicula <- ggplot(ndata.formicula, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.formicula,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.formicula
-ggsave("C:Graphs May 2019//formicula_pred.png")
+ggsave("C:Graphs July 2019//formicula_pred.png")
 
 
 
@@ -869,7 +868,7 @@ plt.alive.mem <- ggplot(ndata.alive.mem, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.alive.mem,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.alive.mem
-ggsave("C:Graphs May 2019//alive.mem_pred.png")
+ggsave("C:Graphs July 2019//alive.mem_pred.png")
 
 
 # GAM beta didemnum / gam.beta.didemnum.12 ------------------------------------------------------------
@@ -952,7 +951,7 @@ plt.didemnum <- ggplot(ndata.didemnum, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.didemnum,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.didemnum
-ggsave("C:Graphs May 2019//didemnum_pred.png")
+ggsave("C:Graphs July 2019//didemnum_pred.png")
 
 
 
@@ -1055,7 +1054,7 @@ plt.mussel_complete <- ggplot(ndata.mussel_complete, aes(x = min.10.pH.unscaled,
   geom_ribbon(data = ndata.mussel_complete,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.mussel_complete
-ggsave("C:Graphs May 2019//mussel_complete_pred.png")
+ggsave("C:Graphs July 2019//mussel_complete_pred.png")
 
 
 # GAM negbin barnacles / gam.nb.num.barn.alive.12 -----------------------------------------------------------
@@ -1139,7 +1138,7 @@ plt.num.barn.alive <- ggplot(ndata.num.barn.alive, aes(x = min.10.pH.unscaled, y
   geom_ribbon(data = ndata.num.barn.alive,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.num.barn.alive
-ggsave("C:Graphs May 2019//num.barn.alive_pred.png")
+ggsave("C:Graphs July 2019//num.barn.alive_pred.png")
 
 
 
@@ -1229,7 +1228,7 @@ plt.disporella <- ggplot(ndata.disporella, aes(x = min.10.pH.unscaled, y = fit))
   geom_ribbon(data = ndata.disporella,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.disporella
-ggsave("C:Graphs May 2019//disporella_pred.png")
+ggsave("C:Graphs July 2019//disporella_pred.png")
 
 
 # GAM negbin schizo / gam.nb.schizo.12 --------------------------------------------------------------
@@ -1320,7 +1319,7 @@ plt.schizo <- ggplot(ndata.schizo, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.schizo,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.schizo
-ggsave("C:Graphs May 2019//schizo_pred.png")
+ggsave("C:Graphs July 2019//schizo_pred.png")
 
 help(summary.gam)
 
@@ -1414,7 +1413,7 @@ plt.num.nudi <- ggplot(ndata.num.nudi, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.num.nudi,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.num.nudi
-ggsave("C:Graphs May 2019//num.nudi_pred.png")
+ggsave("C:Graphs July 2019//num.nudi_pred.png")
 
 
 # GAM nb() serpulids / gam.nb.num.serpulid.12.1 -----------------------------------------------------------
@@ -1502,7 +1501,7 @@ plt.num.serpulid <- ggplot(ndata.num.serpulid, aes(x = min.10.pH.unscaled, y = f
   geom_ribbon(data = ndata.num.serpulid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.num.serpulid
-ggsave("C:Graphs May 2019//num.serpulid_pred.png")
+ggsave("C:Graphs July 2019//num.serpulid_pred.png")
 
 
 # GAM negbin orange sponge / gam.nb.orange_sponge.12 -------------------------------------------------------
@@ -1588,7 +1587,7 @@ plt.orange_sponge <- ggplot(ndata.orange_sponge, aes(x = min.10.pH.unscaled, y =
   geom_ribbon(data = ndata.orange_sponge,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.orange_sponge
-ggsave("C:Graphs May 2019//orange_sponge_pred.png")
+ggsave("C:Graphs July 2019//orange_sponge_pred.png")
 
 
 
@@ -1675,7 +1674,7 @@ plt.num.corella <- ggplot(ndata.num.corella, aes(x = min.10.pH.unscaled, y = fit
   geom_ribbon(data = ndata.num.corella,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.num.corella
-ggsave("C:Graphs May 2019//num.corella_pred.png")
+ggsave("C:Graphs July 2019//num.corella_pred.png")
 
 
 
@@ -1761,7 +1760,7 @@ plt.clam <- ggplot(ndata.clam, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.clam,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.clam
-ggsave("C:Graphs May 2019//clam_pred.png")
+ggsave("C:Graphs July 2019//clam_pred.png")
 
 
 ### legend plot
@@ -1785,7 +1784,7 @@ plt.legend
 
 legend_food <- get_legend(plt.legend + theme(legend.position="bottom"))
 
-# Fig 1 plot generation ---------------------------------------------------
+# Fig 2 plot generation ---------------------------------------------------
 
 
 library(cowplot)
@@ -2116,7 +2115,7 @@ plt.richness <- ggplot(ndata.richness, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.richness,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")+ylim(0,20)
 plt.richness
-ggsave("C:Graphs May 2019//richness_pred.png")
+ggsave("C:Graphs July 2019//richness_pred.png")
 
 
 
@@ -2196,7 +2195,7 @@ plt.evenness <- ggplot(ndata.evenness, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.evenness,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.evenness
-ggsave("C:Graphs May 2019//evenness_pred.png")
+ggsave("C:Graphs July 2019//evenness_pred.png")
 
 
 
@@ -2293,7 +2292,7 @@ plt.occupied.space <- ggplot(ndata.occupied.space, aes(x = min.10.pH.unscaled, y
   geom_ribbon(data = ndata.occupied.space,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.occupied.space
-ggsave("C:Graphs May 2019//occupied.space_pred.png")
+ggsave("C:Graphs July 2019//occupied.space_pred.png")
 
 
 
@@ -2385,7 +2384,7 @@ plt.everything.wet.weight <- ggplot(ndata.everything.wet.weight, aes(x = min.10.
   geom_ribbon(data = ndata.everything.wet.weight,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.everything.wet.weight
-ggsave("C:Graphs May 2019//everything.wet.weight_pred.png")
+ggsave("C:Graphs July 2019//everything.wet.weight_pred.png")
 
 
 # Everything wet weight per 1 ---------------------------------------------
@@ -2476,7 +2475,7 @@ plt.everything.wet.weight.per.1 <- ggplot(ndata.everything.wet.weight.per.1, aes
   geom_ribbon(data = ndata.everything.wet.weight.per.1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.everything.wet.weight.per.1
-ggsave("C:Graphs May 2019//everything.wet.weight.per.1_pred.png")
+ggsave("C:Graphs July 2019//everything.wet.weight.per.1_pred.png")
 
 
 
@@ -2570,7 +2569,7 @@ plt.total_dry_biomass <- ggplot(ndata.total_dry_biomass, aes(x = min.10.pH.unsca
   geom_ribbon(data = ndata.total_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.total_dry_biomass
-ggplot2::ggsave("C:Graphs May 2019//total_dry_biomass_pred.png")
+ggplot2::ggsave("C:Graphs July 2019//total_dry_biomass_pred.png")
 
 
 # Dry weight per 1 % cover --------------------------------------------------------------
@@ -2662,7 +2661,7 @@ plt.total_dry_biomass_per1 <- ggplot(ndata.total_dry_biomass_per1, aes(x = min.1
   geom_ribbon(data = ndata.total_dry_biomass_per1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.total_dry_biomass_per1
-ggplot2::ggsave("C:Graphs May 2019//total_dry_biomass_per1_pred.png")
+ggplot2::ggsave("C:Graphs July 2019//total_dry_biomass_per1_pred.png")
 
 # hydroid biomass ---------------------------------------------------------
 
@@ -2753,7 +2752,7 @@ plt.hydroid_dry_biomass <- ggplot(ndata.hydroid_dry_biomass, aes(x = min.10.pH.u
   geom_ribbon(data = ndata.hydroid_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.hydroid_dry_biomass
-ggplot2::ggsave("C:Graphs May 2019//hydroid_dry_biomass_pred.png")
+ggplot2::ggsave("C:Graphs July 2019//hydroid_dry_biomass_pred.png")
 
 
 
@@ -2847,7 +2846,7 @@ plt.tunicate_dry_biomass <- ggplot(ndata.tunicate_dry_biomass, aes(x = min.10.pH
   geom_ribbon(data = ndata.tunicate_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.tunicate_dry_biomass
-ggplot2::ggsave("C:Graphs May 2019//tunicate_dry_biomass_pred.png")
+ggplot2::ggsave("C:Graphs July 2019//tunicate_dry_biomass_pred.png")
 
 
 
@@ -2940,7 +2939,7 @@ plt.caprellid_dry_biomass <- ggplot(ndata.caprellid_dry_biomass, aes(x = min.10.
   geom_ribbon(data = ndata.caprellid_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.caprellid_dry_biomass
-ggplot2::ggsave("C:Graphs May 2019//caprellid_dry_biomass_pred.png")
+ggplot2::ggsave("C:Graphs July 2019//caprellid_dry_biomass_pred.png")
 
 
 
@@ -3035,7 +3034,7 @@ plt.caprellid_dry_biomass_per1 <- ggplot(ndata.caprellid_dry_biomass_per1, aes(x
   geom_ribbon(data = ndata.caprellid_dry_biomass_per1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")+ylim(0,0.012)
 plt.caprellid_dry_biomass_per1
-ggplot2::ggsave("C:Graphs May 2019//caprellid_dry_biomass_per1_pred.png")
+ggplot2::ggsave("C:Graphs July 2019//caprellid_dry_biomass_per1_pred.png")
 
 
 # rest biomass ------------------------------------------------------------
@@ -3127,7 +3126,7 @@ plt.rest_dry_biomass <- ggplot(ndata.rest_dry_biomass, aes(x = min.10.pH.unscale
   geom_ribbon(data = ndata.rest_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.rest_dry_biomass
-ggplot2::ggsave("C:Graphs May 2019//rest_dry_biomass_pred.png")
+ggplot2::ggsave("C:Graphs July 2019//rest_dry_biomass_pred.png")
 
 
 
@@ -3220,7 +3219,7 @@ plt.Mussel.wet.weight <- ggplot(ndata.Mussel.wet.weight, aes(x = min.10.pH.unsca
   geom_ribbon(data = ndata.Mussel.wet.weight,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.Mussel.wet.weight
-ggsave("C:Graphs May 2019//Mussel.wet.weight_pred.png")
+ggsave("C:Graphs July 2019//Mussel.wet.weight_pred.png")
 
 
 
@@ -3323,7 +3322,7 @@ plt.Mussel.wet.weight.per.1 <- ggplot(ndata.Mussel.wet.weight.per.1, aes(x = min
   geom_ribbon(data = ndata.Mussel.wet.weight.per.1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.Mussel.wet.weight.per.1
-ggsave("C:Graphs May 2019//Mussel.wet.weight.per.1_pred.png")
+ggsave("C:Graphs July 2019//Mussel.wet.weight.per.1_pred.png")
 
 
 
@@ -3602,7 +3601,7 @@ plt.CAP1 <- ggplot(ndata.CAP1, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.CAP1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.CAP1
-ggsave("C:Graphs May 2019//CAP1_pred.png")
+ggsave("C:Graphs July 2019//CAP1_pred.png")
 
 
 
@@ -3684,21 +3683,21 @@ plt.distances <- ggplot(ndata.distances, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.distances,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.distances
-ggsave("C:Graphs May 2019//distances_pred.png")
+ggsave("C:Graphs July 2019//distances_pred.png")
 
 
 
 
 # Community plotting ------------------------------------------------------
 library(cowplot)
-fig.biomass<-plot_grid(plt.total_dry_biomass,plt.everything.wet.weight, plt.hydroid_dry_biomass,
-                 plt.tunicate_dry_biomass, plt.Mussel.wet.weight,ncol=5, align='v', 
-                 labels=c('(a)', '(b)','(c)', '(d)', '(e)', 
-                          label_size=12))
+#fig.biomass<-plot_grid(plt.total_dry_biomass,plt.everything.wet.weight, plt.hydroid_dry_biomass,
+    #             plt.tunicate_dry_biomass, plt.Mussel.wet.weight,ncol=5, align='v', 
+     #            labels=c('(a)', '(b)','(c)', '(d)', '(e)', 
+      #                    label_size=12))
 
-fig.biomass
+#fig.biomass
 
-ggplot2::ggsave("C:For submission//Fig.biomass.png", width=65, height=10, units="cm")
+#ggplot2::ggsave("C:For submission//Fig.biomass.png", width=65, height=10, units="cm")
 
 #### revised community fig
 fig.3.community<-plot_grid( plt.occupied.space,plt.total_dry_biomass,

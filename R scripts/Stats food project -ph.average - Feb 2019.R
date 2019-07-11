@@ -1,5 +1,5 @@
 # read in useful packages
-setwd("C:/Users/Norah/Dropbox/Projects/Summer 2015 food availability experiments/Data")
+setwd("C:/Users/Norah/Dropbox/Projects/Food-availability-experiment-2015/Data")
 
 
 
@@ -55,7 +55,7 @@ food.exp.data.12.2019$Food.quality<-factor(food.exp.data.12.2019$Food.quality, l
 
 food.exp.data.12.2019$occupied.space<-100-food.exp.data.12.2019$bare
 food.exp.data.12.2019$occupied.space.001<-0.01*(food.exp.data.12.2019$occupied.space)
-
+food.exp.data.12.2019$caprellid.percent<-food.exp.data.tile.all$caprellid
 food.exp.data.12.2019$hydroid<-food.exp.data.tile.all$hydroid
 food.exp.data.12.2019$alive.bot<-food.exp.data.tile.all$alive.bot
 food.exp.data.12.2019$formicula<-food.exp.data.tile.all$formicula
@@ -63,10 +63,13 @@ food.exp.data.12.2019$alive.mem<-food.exp.data.tile.all$alive.mem
 food.exp.data.12.2019$didemnum<-food.exp.data.tile.all$didemnum
 food.exp.data.12.2019$total<-food.exp.data.tile.all$total
 food.exp.data.12.2019$bare<-food.exp.data.tile.all$bare
+food.exp.data.12.2019$occupied.space<-100-food.exp.data.12.2019$bare
+food.exp.data.12.2019$occupied.space.001<-0.01*(food.exp.data.12.2019$occupied.space)
 food.exp.data.12.2019$everything.wet.weight<-food.exp.data.tile.all$everything.wet.weight
 food.exp.data.12.2019$everything.wet.weight.per.1<-(food.exp.data.tile.all$everything.wet.weight)/food.exp.data.12.2019$occupied.space
 food.exp.data.12.2019$Mussel.wet.weight<-food.exp.data.tile.all$Mussel.wet.weight
 food.exp.data.12.2019$total_dry_biomass<-food.exp.data.tile.all$total_dry_biomass
+food.exp.data.12.2019$total_dry_biomass_per1<-food.exp.data.tile.all$total_dry_biomass/food.exp.data.12.2019$occupied.space
 food.exp.data.12.2019$hydroid_dry_biomass<-food.exp.data.tile.all$hydroid_dry_biomass
 food.exp.data.12.2019$caprellid_dry_biomass<-food.exp.data.tile.all$caprellid_dry_biomass
 food.exp.data.12.2019$tunicate_dry_biomass<-food.exp.data.tile.all$tunicate_dry_biomass
@@ -84,6 +87,7 @@ food.exp.data.12.2019$distances<-bd.bray$distances
 food.exp.data.12.2019$Mussel.wet.weight.per.1<-(food.exp.data.12.2019$Mussel.wet.weight)/(food.exp.data.12.2019$mussel_complete+1)
 
 
+food.exp.data.12.2019$caprellid.percent.001<-0.01*(food.exp.data.12.2019$caprellid.percent+0.01)
 food.exp.data.12.2019$hydroid.001<-0.01*(food.exp.data.12.2019$hydroid)
 food.exp.data.12.2019$alive.bot.001<-0.01*(food.exp.data.12.2019$alive.bot)
 food.exp.data.12.2019$alive.mem.001<-0.01*(food.exp.data.12.2019$alive.mem)
@@ -431,7 +435,7 @@ plt.av.gam.av.hydroid <- ggplot(ndata.av.hydroid, aes(x = av.pH.unscaled, y = fi
   geom_ribbon(data = ndata.av.hydroid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.gam.av.hydroid 
-ggsave("C:Graphs May 2019//hydroid_pred_av.png")
+ggsave("C:Graphs July 2019//Average//hydroid_pred_av.png")
 
 
 
@@ -508,7 +512,7 @@ plt.av.alive.bot <- ggplot(ndata.av.alive.bot, aes(x = av.pH.unscaled, y = fit))
   geom_ribbon(data = ndata.av.alive.bot,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.alive.bot
-ggsave("C:Graphs May 2019//alive.bot_pred_av.png")
+ggsave("C:Graphs July 2019//Average//alive.bot_pred_av.png")
 
 
 
@@ -598,7 +602,7 @@ plt.av.caprellid <- ggplot(ndata.av.caprellid, aes(x = av.pH.unscaled, y = fit))
   geom_ribbon(data = ndata.av.caprellid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.caprellid
-ggsave("C:Graphs May 2019//caprellid_pred_av.png")
+ggsave("C:Graphs July 2019//Average//caprellid_pred_av.png")
 
 
 
@@ -673,7 +677,7 @@ plt.caprellid.av.percent <- ggplot(ndata.caprellid.av.percent, aes(x = av.pH.uns
   geom_ribbon(data = ndata.caprellid.av.percent,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.caprellid.av.percent
-ggsave("C:Graphs May 2019//caprellid.av.percent_pred.png")
+ggsave("C:Graphs July 2019//Average//caprellid.av.percent_pred.png")
 
 
 # GAM beta formicula / gam.av.beta.formicula.12 -----------------------------------------------------------
@@ -761,7 +765,7 @@ plt.av.formicula <- ggplot(ndata.av.formicula, aes(x = av.pH.unscaled, y = fit))
   geom_ribbon(data = ndata.av.formicula,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.formicula
-ggsave("C:Graphs May 2019//formicula_pred_av.png")
+ggsave("C:Graphs July 2019//Average//formicula_pred_av.png")
 
 
 
@@ -844,7 +848,7 @@ plt.av.alive.mem <- ggplot(ndata.av.alive.mem, aes(x = av.pH.unscaled, y = fit))
   geom_ribbon(data = ndata.av.alive.mem,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.alive.mem
-ggsave("C:Graphs May 2019//alive.mem_pred_av.png")
+ggsave("C:Graphs July 2019//Average//alive.mem_pred_av.png")
 
 
 # GAM beta didemnum / gam.av.beta.didemnum.12 ------------------------------------------------------------
@@ -927,7 +931,7 @@ plt.av.didemnum <- ggplot(ndata.av.didemnum, aes(x = av.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.av.didemnum,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.didemnum
-ggsave("C:Graphs May 2019//didemnum_pred_av.png")
+ggsave("C:Graphs July 2019//Average//didemnum_pred_av.png")
 
 
 
@@ -1024,7 +1028,7 @@ plt.av.mussel_complete <- ggplot(ndata.av.mussel_complete, aes(x = av.pH.unscale
   geom_ribbon(data = ndata.av.mussel_complete,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.mussel_complete
-ggsave("C:Graphs May 2019//mussel_complete_pred_av.png")
+ggsave("C:Graphs July 2019//Average//mussel_complete_pred_av.png")
 
 
 # GAM negbin barnacles / gam.av.nb.num.barn.alive.12 -----------------------------------------------------------
@@ -1108,7 +1112,7 @@ plt.av.num.barn.alive <- ggplot(ndata.av.num.barn.alive, aes(x = av.pH.unscaled,
   geom_ribbon(data = ndata.av.num.barn.alive,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.num.barn.alive
-ggsave("C:Graphs May 2019//num.barn.alive_pred_av.png")
+ggsave("C:Graphs July 2019//Average//num.barn.alive_pred_av.png")
 
 
 
@@ -1198,7 +1202,7 @@ plt.av.disporella <- ggplot(ndata.av.disporella, aes(x = av.pH.unscaled, y = fit
   geom_ribbon(data = ndata.av.disporella,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.disporella
-ggsave("C:Graphs May 2019//disporella_pred_av.png")
+ggsave("C:Graphs July 2019//Average//disporella_pred_av.png")
 
 
 # GAM negbin schizo / gam.av.nb.schizo.12 --------------------------------------------------------------
@@ -1289,7 +1293,7 @@ plt.av.schizo <- ggplot(ndata.av.schizo, aes(x = av.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.av.schizo,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.schizo
-ggsave("C:Graphs May 2019//schizo_pred_av.png")
+ggsave("C:Graphs July 2019//Average//schizo_pred_av.png")
 
 
 
@@ -1385,7 +1389,7 @@ plt.av.num.nudi <- ggplot(ndata.av.num.nudi, aes(x = av.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.av.num.nudi,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.num.nudi
-ggsave("C:Graphs May 2019//num.nudi_pred_av.png")
+ggsave("C:Graphs July 2019//Average//num.nudi_pred_av.png")
 
 
 # GAM nb() serpulids / gam.av.nb.num.serpulid.12.1 -----------------------------------------------------------
@@ -1475,7 +1479,7 @@ plt.av.num.serpulid <- ggplot(ndata.av.num.serpulid, aes(x = av.pH.unscaled, y =
   geom_ribbon(data = ndata.av.num.serpulid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.num.serpulid
-ggsave("C:Graphs May 2019//num.serpulid_pred_av.png")
+ggsave("C:Graphs July 2019//Average//num.serpulid_pred_av.png")
 
 
 # GAM negbin orange sponge / gam.av.nb.orange_sponge.12.1 -------------------------------------------------------
@@ -1563,7 +1567,7 @@ plt.av.orange_sponge <- ggplot(ndata.av.orange_sponge, aes(x = av.pH.unscaled, y
   geom_ribbon(data = ndata.av.orange_sponge,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.orange_sponge
-ggsave("C:Graphs May 2019//orange_sponge_pred_av.png")
+ggsave("C:Graphs July 2019//Average//orange_sponge_pred_av.png")
 
 
 
@@ -1657,7 +1661,7 @@ plt.av.num.corella <- ggplot(ndata.av.num.corella, aes(x = av.pH.unscaled, y = f
   geom_ribbon(data = ndata.av.num.corella,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.num.corella
-ggsave("C:Graphs May 2019//num.corella_pred_av.png")
+ggsave("C:Graphs July 2019//Average//num.corella_pred_av.png")
 
 
 
@@ -1744,23 +1748,23 @@ plt.av.clam <- ggplot(ndata.av.clam, aes(x = av.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.av.clam,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.clam
-ggsave("C:Graphs May 2019//clam_pred_av.png")
+ggsave("C:Graphs July 2019//Average//clam_pred_av.png")
 
 
 
-# Fig 1 plot generation ---------------------------------------------------
+# Fig 2 av plot generation ---------------------------------------------------
 
 
 library(cowplot)
-fig.1.av<-plot_grid(plt.av.gam.av.hydroid,plt.av.alive.bot,plt.av.formicula,plt.caprellid.av.percent,plt.av.alive.mem,plt.av.didemnum,
-          plt.av.mussel_complete,plt.av.num.barn.alive,plt.av.disporella,plt.av.schizo,plt.av.num.nudi,plt.av.num.serpulid,
-          plt.av.orange_sponge,plt.av.num.corella,plt.av.clam,ncol=5, align='v', 
-          labels=c('(a)', '(b)','(c)', '(d)', '(e)', '(f)', '(g)', '(h)', '(i)', '(j)','(k)','(l)','(m)','(n)','(o)', 
-          label_size=12))
 
-fig.1.av
+fig.2.av<-plot_grid(plt.av.gam.av.hydroid,plt.av.alive.bot,plt.av.formicula,plt.caprellid.av.percent,plt.av.alive.mem,plt.av.didemnum,
+                 plt.av.mussel_complete,plt.av.num.barn.alive,plt.av.disporella,plt.av.schizo,plt.av.num.nudi,plt.av.num.serpulid,
+                 plt.av.orange_sponge,plt.av.num.corella,plt.av.clam,legend_food, ncol=5, rel_heights = c(1,1,1,.2), align='v', axis = 'l', 
+                 labels=c('(a)', '(b)','(c)', '(d)', '(e)', '(f)', '(g)', 
+                          '(h)', '(i)', '(j)','(k)','(l)','(m)','(n)','(o)', ''))
+fig.2.av
 
-ggsave("C:For submission//Fig1.av.png", width=65, height=35, units="cm")
+ggsave("C:For submission//Fig2.av.png", width=65, height=35, units="cm")
 
 
 
@@ -2070,7 +2074,7 @@ plt.av.richness <- ggplot(ndata.av.richness, aes(x = av.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.av.richness,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.richness
-ggsave("C:Graphs May 2019//richness_pred_av.png")
+ggsave("C:Graphs July 2019//Average//richness_pred_av.png")
 
 
 
@@ -2150,7 +2154,7 @@ plt.av.evenness <- ggplot(ndata.av.evenness, aes(x = av.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.av.evenness,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.evenness
-ggsave("C:Graphs May 2019//evenness_pred_av.png")
+ggsave("C:Graphs July 2019//Average//evenness_pred_av.png")
 
 
 
@@ -2247,7 +2251,7 @@ plt.av.occupied.space <- ggplot(ndata.av.occupied.space, aes(x = av.pH.unscaled,
   geom_ribbon(data = ndata.av.occupied.space,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.occupied.space
-ggsave("C:Graphs May 2019//occupied.space_pred_av.png")
+ggsave("C:Graphs July 2019//Average//occupied.space_pred_av.png")
 
 
 
@@ -2339,7 +2343,7 @@ plt.av.everything.wet.weight <- ggplot(ndata.av.everything.wet.weight, aes(x = a
   geom_ribbon(data = ndata.av.everything.wet.weight,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.everything.wet.weight
-ggsave("C:Graphs May 2019//everything.wet.weight_pred_av.png")
+ggsave("C:Graphs July 2019//Average//everything.wet.weight_pred_av.png")
 
 
 
@@ -2433,7 +2437,7 @@ plt.av.everything.wet.weight.per.1 <- ggplot(ndata.av.everything.wet.weight.per.
   geom_ribbon(data = ndata.av.everything.wet.weight.per.1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.everything.wet.weight.per.1
-ggsave("C:Graphs May 2019//everything.wet.weight.per.1_pred_av.png")
+ggsave("C:Graphs July 2019//Average//everything.wet.weight.per.1_pred_av.png")
 
 
 
@@ -2526,7 +2530,7 @@ plt.av.total_dry_biomass <- ggplot(ndata.av.total_dry_biomass, aes(x = av.pH.uns
   geom_ribbon(data = ndata.av.total_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.total_dry_biomass
-ggplot2::ggsave("C:Graphs May 2019//total_dry_biomass_pred_av.png")
+ggplot2::ggsave("C:Graphs July 2019//Average//total_dry_biomass_pred_av.png")
 
 # hydroid biomass ---------------------------------------------------------
 
@@ -2616,7 +2620,7 @@ plt.av.hydroid_dry_biomass <- ggplot(ndata.av.hydroid_dry_biomass, aes(x = av.pH
   geom_ribbon(data = ndata.av.hydroid_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")+ylim(0,.75)
 plt.av.hydroid_dry_biomass
-ggplot2::ggsave("C:Graphs May 2019//hydroid_dry_biomass_pred_av.png")
+ggplot2::ggsave("C:Graphs July 2019//Average//hydroid_dry_biomass_pred_av.png")
 
 
 
@@ -2710,7 +2714,7 @@ plt.av.tunicate_dry_biomass <- ggplot(ndata.av.tunicate_dry_biomass, aes(x = av.
   geom_ribbon(data = ndata.av.tunicate_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.tunicate_dry_biomass
-ggplot2::ggsave("C:Graphs May 2019//tunicate_dry_biomass_pred_av.png")
+ggplot2::ggsave("C:Graphs July 2019//Average//tunicate_dry_biomass_pred_av.png")
 
 
 
@@ -2802,7 +2806,7 @@ plt.av.caprellid_dry_biomass <- ggplot(ndata.av.caprellid_dry_biomass, aes(x = a
   geom_ribbon(data = ndata.av.caprellid_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.caprellid_dry_biomass
-ggplot2::ggsave("C:Graphs May 2019//caprellid_dry_biomass_pred_av.png")
+ggplot2::ggsave("C:Graphs July 2019//Average//caprellid_dry_biomass_pred_av.png")
 
 
 
@@ -2895,7 +2899,7 @@ plt.av.rest_dry_biomass <- ggplot(ndata.av.rest_dry_biomass, aes(x = av.pH.unsca
   geom_ribbon(data = ndata.av.rest_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.rest_dry_biomass
-ggplot2::ggsave("C:Graphs May 2019//rest_dry_biomass_pred_av.png")
+ggplot2::ggsave("C:Graphs July 2019//Average//rest_dry_biomass_pred_av.png")
 
 
 
@@ -2991,7 +2995,7 @@ plt.av.Mussel.wet.weight <- ggplot(ndata.av.Mussel.wet.weight, aes(x = av.pH.uns
   geom_ribbon(data = ndata.av.Mussel.wet.weight,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.Mussel.wet.weight
-ggsave("C:Graphs May 2019//Mussel.wet.weight_pred_av.png")
+ggsave("C:Graphs July 2019//Average//Mussel.wet.weight_pred_av.png")
 
 
 
@@ -3092,7 +3096,7 @@ plt.av.Mussel.wet.weight.per.1 <- ggplot(ndata.av.Mussel.wet.weight.per.1, aes(x
   geom_ribbon(data = ndata.av.Mussel.wet.weight.per.1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.Mussel.wet.weight.per.1
-ggsave("C:Graphs May 2019//Mussel.wet.weight.per.1_pred_av.png")
+ggsave("C:Graphs July 2019//Average//Mussel.wet.weight.per.1_pred_av.png")
 
 
 
@@ -3371,7 +3375,7 @@ plt.av.CAP1 <- ggplot(ndata.av.CAP1, aes(x = av.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.av.CAP1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.CAP1
-ggsave("C:Graphs May 2019//CAP1_pred_av.png")
+ggsave("C:Graphs July 2019//Average//CAP1_pred_av.png")
 
 
 
@@ -3452,30 +3456,34 @@ plt.av.distances <- ggplot(ndata.av.distances, aes(x = av.pH.unscaled, y = fit))
   geom_ribbon(data = ndata.av.distances,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.distances
-ggsave("C:Graphs May 2019//distances_pred_av.png")
+ggsave("C:Graphs July 2019//Average//distances_pred_av.png")
 
 
 
 
 # Community plotting ------------------------------------------------------
 library(cowplot)
-fig.av.biomass<-plot_grid(plt.av.total_dry_biomass,plt.av.everything.wet.weight ,plt.av.hydroid_dry_biomass,
+#fig.av.biomass<-plot_grid(plt.av.total_dry_biomass,plt.av.everything.wet.weight ,plt.av.hydroid_dry_biomass,
                            plt.av.tunicate_dry_biomass,plt.av.Mussel.wet.weight,ncol=5, align='v', 
                            labels=c('(a)', '(b)','(c)', '(d)', '(e)', 
                                     label_size=12))
 
-fig.av.biomass
+#fig.av.biomass
 
-ggplot2::ggsave("C:For submission//Supplemental//Fig.av.biomass.png", width=65, height=10, units="cm")
+#ggplot2::ggsave("C:For submission//Supplemental//Fig.av.biomass.png", width=65, height=10, units="cm")
 
 
-fig.av.community<-plot_grid(plt.av.richness, plt.av.evenness, plt.av.occupied.space,plt.av.CAP1, plt.av.distances,ncol=5, align='v', 
-                         labels=c('(a)', '(b)','(c)', '(d)', '(e)', 
-                                  label_size=12))
 
-fig.av.community
+fig.3.av.community<-plot_grid( plt.av.occupied.space,plt.av.total_dry_biomass,
+                               plt.av.richness, plt.av.evenness,
+                               plt.av.CAP1, plt.av.distances,legend_food, ncol=2, rel_heights = c(1,1,1,.2),
+                               align='v', axis='l',
+                               labels=c('(a)', '(b)','(c)', '(d)', '(e)', '(f)'))
 
-ggplot2::ggsave("C:For submission//Fig.av.community.png", width=65, height=10, units="cm")
+fig.3.av.community
+
+
+ggplot2::ggsave("C:For submission//Fig.3.av.community.png",  width=30, height=40, units="cm")
 
 
 # Community level tables --------------------------------------------------
