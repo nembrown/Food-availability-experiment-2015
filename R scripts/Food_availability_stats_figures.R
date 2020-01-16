@@ -1290,7 +1290,7 @@ plt.legend <- ggplot(ndata.clam, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_line(size=1.5, aes(colour=oFood.quality)) +
   geom_point(aes(y = clam, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Clam abundance\n(# of individuals)")+  
-  scale_color_manual(values=colorset2, name = "Food quality", labels = c("None", "Low-quality", "High-quality"))+
+  scale_color_manual(values=colorset2, name = "Food supplementation", labels = c("None", "Low-quality", "High-quality"))+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17), name = "pH", labels = c("Ambient", "Low pH"))+
   guides(color = guide_legend(order = 2), shape = guide_legend(order = 1), fill = FALSE)+
@@ -1311,7 +1311,7 @@ fig.2<-plot_grid(plt.gam.hydroid,plt.alive.bot,plt.formicula,plt.caprellid.perce
 
 fig.2
 
-ggplot2::ggsave("C:Data//For submission//Fig2.png", width=65, height=35, units="cm")
+ggplot2::ggsave("C:Data//For submission//For resubmission//Fig2.png", width=65, height=35, units="cm")
 
 
 
@@ -1534,7 +1534,7 @@ pstable %>%
   group_rows("Sponge, negative binomial", 37, 39) %>% 
   group_rows("Corella, negative binomial", 40, 42) %>% 
   group_rows("Clams, poisson", 43, 45) %>% 
-  save_kable(file = "C:Data//For submission//pstable.html", self_contained = T)
+  save_kable(file = "C:Data//For submission//For resubmission//pstable.html", self_contained = T)
 
 
 # Richness ----------------------------------------------------------------
@@ -2765,7 +2765,7 @@ fig.3.community<-plot_grid( plt.occupied.space,plt.total_dry_biomass,
 
 fig.3.community
 
-ggplot2::ggsave("C:Data//For submission//Fig3.community.png", width=30, height=40, units="cm")
+ggplot2::ggsave("C:Data//For submission//For resubmission//Fig3.community.png", width=30, height=40, units="cm")
 
 
 
@@ -2996,5 +2996,4 @@ pstable.community %>%
   group_rows("Botryllus to Obelia dominance ratio by space, beta (Chi-square, z)", 19,21) %>% 
   group_rows("Botryllus to Obelia dominance ratio by biomass, beta (Chi-square, z)", 22,24) %>% 
   group_rows("Total wet biomass, normal (log)", 25,27) %>% 
-  
-  save_kable(file = "C:Data//For submission//pstable.community.html", self_contained = T)
+  save_kable(file = "C:Data//For submission//For resubmission//pstable.community.html", self_contained = T)
