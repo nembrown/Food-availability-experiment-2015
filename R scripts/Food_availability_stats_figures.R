@@ -53,9 +53,6 @@ library(installr)
 food.exp.data.12.2019<-read.csv("C:Data//Mesocosm inventory data//food.exp.data.mesocosm.12.csv")
 food.exp.data.tile.all<-read.csv("C:Data//Mesocosm inventory data//food.exp.data.tile.all.csv")
 food.caprellid.data<-read.csv("C:Data//Emily caprellid data.csv", stringsAsFactors = FALSE, na.strings = c("NA","") )
-bd.overall.bray.distances.2<-read.csv("C:Data//Mesocosm inventory data//bd.overall.bray.distances.2.csv")
-model.meso.bray.scores<-read.csv("C:Data//Mesocosm inventory data//model.meso.bray.scores.csv")
-
 
 
 #ordered and unordered factors
@@ -89,10 +86,6 @@ food.exp.data.12.2019$hydroid_dry_biomass[food.exp.data.12.2019$hydroid_dry_biom
 food.exp.data.12.2019$tunicate_dry_biomass[food.exp.data.12.2019$tunicate_dry_biomass<0]<-0
 food.exp.data.12.2019$hydtobot_dry_biomass<-(food.exp.data.12.2019$tunicate_dry_biomass)/(food.exp.data.12.2019$tunicate_dry_biomass+food.exp.data.12.2019$hydroid_dry_biomass)
 
-#read in community data from other file
-food.exp.data.12.2019$CAP1<-model.meso.bray.scores$CAP1
-food.exp.data.12.2019$distances<-#### not in right order! bd.overall.bray.distances.2$distcentroid
-  ### 
 
 food.exp.data.12.2019$Mussel.wet.weight.per.1<-(food.exp.data.12.2019$Mussel.wet.weight)/(food.exp.data.12.2019$mussel_complete+1)
 
@@ -448,7 +441,7 @@ gam.beta.formicula.12.3<- gam(formicula.001~ s(min.10.pH)+ oFood.quality + s(min
 
 
 AICtab(gam.beta.formicula.12, gam.beta.formicula.12.1, gam.beta.formicula.12.2,gam.binomial.formicula.12, gam.beta.formicula.12.3)
-#12, 12.1, 12.2 best - go with simpler logit
+#12, 12.1, 12.2 best - go with simplest logit
 
 
 plot(gam.beta.formicula.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
@@ -519,7 +512,7 @@ gam.beta.alive.mem.12.3<- gam(alive.mem.001~ s(min.10.pH)+ oFood.quality + s(min
 
 
 AICtab( gam.beta.alive.mem.12, gam.beta.alive.mem.12.1, gam.beta.alive.mem.12.2, gam.binomial.alive.mem.12, gam.beta.alive.mem.12.3)
-#12, 12.1, 12.2, 12.3 all equal, go with 12
+#12, 12.1, 12.2, 12.3 all equal, go with logit
 
 
 plot(gam.beta.alive.mem.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
@@ -588,7 +581,7 @@ gam.beta.didemnum.12.3<- gam(didemnum.001~ s(min.10.pH)+ oFood.quality + s(min.1
 
 
 AICtab(gam.beta.didemnum.12, gam.beta.didemnum.12.1, gam.beta.didemnum.12.2,  gam.binomial.didemnum.12, gam.beta.didemnum.12.3)
-#logit, all the betas are equal
+#logit, all the betas are equal go with logit
 
 plot(gam.beta.didemnum.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
 appraise(gam.beta.didemnum.12)
@@ -598,7 +591,7 @@ k.check(gam.beta.didemnum.12)
 summary(gam.beta.didemnum.12)
 vis.gam(gam.beta.didemnum.12)
 
-#appraise doesn't fit that well .... *** what to do? 
+#appraise doesn't fit that well .... but I think there's just not enough data
 
 gam.beta.didemnum.12.unordered<- gam(didemnum.001~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality), data = food.exp.data.12.2019_zscores, family = betar(link="logit"), select=TRUE, method="REML")
 
@@ -1034,7 +1027,9 @@ plot(gam.nb.num.serpulid.12.1, shade = TRUE, pages = 1, scale = 0, seWithMean = 
 k.check(gam.nb.num.serpulid.12.1)
 summary(gam.nb.num.serpulid.12.1)
 
-#residuals a bit weird .... but they are the same in glm as in gam
+#residuals a bit weird .... but they are the same in glm as in gam (doesn't improve)
+#I think because of the zeros? 
+
 gam.nb.num.serpulid.12.1.unordered<- gam(num.serpulid ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = nb(), select=TRUE, method="REML")
 
 
@@ -1550,12 +1545,12 @@ AICtab(gam.nb.richness.12.1, gam.poisson.richness.12)
 
 plot(gam.poisson.richness.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
 appraise(gam.poisson.richness.12)
-#okay
+#okay but qq plot not the best on ends
 qq_plot(gam.poisson.richness.12, method = 'simulate')
 k.check(gam.poisson.richness.12)
 summary(gam.poisson.richness.12)
 #a few outside the QQ plot on both ends
-#low p value for k - but NS
+#low p value for k - but NS and edf is not super close to k-index
 
 gam.poisson.richness.12.unordered<- gam(richness ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = poisson, select=TRUE, method="REML")
 fam.gam.richness <- family(gam.poisson.richness.12)
@@ -1682,8 +1677,9 @@ appraise(gam.beta.occupied.space.12.3)
 #a bit blocky
 qq_plot(gam.beta.occupied.space.12.3, method = 'simulate')
 k.check(gam.beta.occupied.space.12.3)
+#k gettinga bit low but ns
 summary(gam.beta.occupied.space.12.3)
-gam.beta.occupied.space.12.3.unordered<- gam(occupied.space.001~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality), data = food.exp.data.12.2019_zscores, family = betar(link="logit"), select=TRUE, method="REML")
+gam.beta.occupied.space.12.3.unordered<- gam(occupied.space.001~ s(min.10.pH, k=15)+ Food.quality + s(min.10.pH, by=oFood.quality, k=15), data = food.exp.data.12.2019_zscores, family = betar(link="logit"), select=TRUE, method="REML")
 summary(gam.beta.occupied.space.12.3.unordered)
 
 fam.gam.occupied.space <- family(gam.beta.occupied.space.12.3)
@@ -2270,37 +2266,35 @@ ggplot2::ggsave("C:Data//Graphs December 2019//caprellid_dry_biomass_per1_pred.p
 
 # rest biomass ------------------------------------------------------------
 
-gam.lm.rest_dry_biomass.12<- gam(rest_dry_biomass ~ s(min.10.pH)+ oFood.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
-gam.gamma.rest_dry_biomass.12<- gam(rest_dry_biomass+0.1 ~ s(min.10.pH)+ oFood.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = Gamma, select=TRUE, method="REML")
-gam.lm.log.rest_dry_biomass.12<- gam(log(rest_dry_biomass+0.1) ~ s(min.10.pH)+ oFood.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
-gam.tweedie.rest_dry_biomass.12<- gam(rest_dry_biomass+0.1 ~ s(min.10.pH)+ oFood.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = tw, select=TRUE, method="REML")
-gam.loglink.rest_dry_biomass.12<- gam(rest_dry_biomass+0.1 ~ s(min.10.pH)+ oFood.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = gaussian(link="log"), select=TRUE, method="REML")
+#kcheck was significant so increase k from 10 to 11
+gam.lm.rest_dry_biomass.12<- gam(rest_dry_biomass ~ s(min.10.pH, k=12)+ oFood.quality + s(min.10.pH, by=oFood.quality, k=12),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
+gam.gamma.rest_dry_biomass.12<- gam(rest_dry_biomass+0.1 ~ s(min.10.pH, k=12)+ oFood.quality + s(min.10.pH, by=oFood.quality, k=12),data = food.exp.data.12.2019_zscores, family = Gamma, select=TRUE, method="REML")
+gam.lm.log.rest_dry_biomass.12<- gam(log(rest_dry_biomass+0.1) ~ s(min.10.pH, k=12)+ oFood.quality + s(min.10.pH, by=oFood.quality, k=12),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
+gam.tweedie.rest_dry_biomass.12<- gam(rest_dry_biomass+0.1 ~ s(min.10.pH, k=12)+ oFood.quality + s(min.10.pH, by=oFood.quality, k=12),data = food.exp.data.12.2019_zscores, family = tw, select=TRUE, method="REML")
+gam.loglink.rest_dry_biomass.12<- gam(rest_dry_biomass+0.1 ~ s(min.10.pH, k=12)+ oFood.quality + s(min.10.pH, by=oFood.quality, k=12),data = food.exp.data.12.2019_zscores, family = gaussian(link="log"), select=TRUE, method="REML")
 
 
 AICtab(gam.loglink.rest_dry_biomass.12, gam.lm.log.rest_dry_biomass.12, gam.tweedie.rest_dry_biomass.12, gam.lm.rest_dry_biomass.12, gam.gamma.rest_dry_biomass.12)
 
-#gamma best 
+#tweedie the best 
 
 
-plot(gam.gamma.rest_dry_biomass.12 , shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.gamma.rest_dry_biomass.12 )
-#look good
-qq_plot(gam.gamma.rest_dry_biomass.12 , method = 'simulate')
-k.check(gam.gamma.rest_dry_biomass.12 )
-###k check is significant
-summary(gam.gamma.rest_dry_biomass.12 )
+plot(gam.tweedie.rest_dry_biomass.12 , shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
+qq_plot(gam.tweedie.rest_dry_biomass.12 , method = 'simulate')
+k.check(gam.tweedie.rest_dry_biomass.12 )
+summary(gam.tweedie.rest_dry_biomass.12)
 
-gam.gamma.rest_dry_biomass.12.unordered<- gam(rest_dry_biomass+0.1 ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = Gamma, select=TRUE, method="REML")
-summary(gam.gamma.rest_dry_biomass.12.unordered)
+gam.tweedie.rest_dry_biomass.12.unordered<- gam(rest_dry_biomass+0.1 ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = Gamma, select=TRUE, method="REML")
+summary(gam.tweedie.rest_dry_biomass.12.unordered)
 
-fam.gam.rest_dry_biomass <- family(gam.gamma.rest_dry_biomass.12)
+fam.gam.rest_dry_biomass <- family(gam.tweedie.rest_dry_biomass.12)
 fam.gam.rest_dry_biomass
 str(fam.gam.rest_dry_biomass)
 ilink.gam.rest_dry_biomass<- fam.gam.rest_dry_biomass$linkinv
 ilink.gam.rest_dry_biomass
 
 
-mod.rest_dry_biomass<-gam.gamma.rest_dry_biomass.12
+mod.rest_dry_biomass<-gam.tweedie.rest_dry_biomass.12
 ndata.rest_dry_biomass <- with(food.exp.data.12.2019_zscores, data_frame(min.10.pH = seq(min(min.10.pH), max(min.10.pH),
                                                                                             length = 100),  oFood.quality = oFood.quality[want],  CO2= CO2[want]))
 ## add the fitted values by predicting from the model for the new data
@@ -2634,9 +2628,10 @@ plt.gam.hydtobot_dry_biomass
 
 
 # CAP1 --------------------------------------------------------------------
-
+#negative values so can't do gamma
 gam.lm.CAP1.12<- gam(CAP1 ~ s(min.10.pH)+ oFood.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
 gam.loglink.CAP1.12.1<- gam(CAP1 ~ s(min.10.pH)+ oFood.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = gaussian(link="log"), select=TRUE, method="REML")
+
 
 AICtab( gam.loglink.CAP1.12.1, gam.lm.CAP1.12)
 #gam.lm.CAP1
@@ -2697,21 +2692,25 @@ ggsave("C:Data//Graphs December 2019//CAP1_pred.png")
 
 # Distances ---------------------------------------------------------------
 
-gam.lm.distances.12<- gam(distances ~ s(min.10.pH)+ oFood.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
-gam.loglink.distances.12.1<- gam(distances ~ s(min.10.pH)+ oFood.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = gaussian(link="log"), select=TRUE, method="REML")
+#k check was significant so increased k from 10 to 11
 
-AICtab(gam.loglink.distances.12.1,  gam.lm.distances.12)
+gam.lm.distances.12<- gam(distcentroid ~ s(min.10.pH, k=11)+ oFood.quality + s(min.10.pH, by=oFood.quality, k=11),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
+gam.loglink.distances.12.1<- gam(distcentroid~ s(min.10.pH, k=11)+ oFood.quality + s(min.10.pH, by=oFood.quality, k=11),data = food.exp.data.12.2019_zscores, family = gaussian(link="log"), select=TRUE, method="REML")
+gam.gamma.distances.12<- gam(distcentroid~ s(min.10.pH, k=11)+ oFood.quality + s(min.10.pH, by=oFood.quality, k=11),data = food.exp.data.12.2019_zscores, family = Gamma, select=TRUE, method="REML")
+
+AICtab(gam.loglink.distances.12.1,  gam.lm.distances.12, gam.gamma.distances.12)
 #gam.lm.distances although both are equal
 
 
 plot(gam.lm.distances.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
 appraise(gam.lm.distances.12)
-#look good
+#looks good
 qq_plot(gam.lm.distances.12, method = 'simulate')
 k.check(gam.lm.distances.12)
+#good now
 summary(gam.lm.distances.12)
 
-gam.lm.distances.12.unordered<- gam(distances ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
+gam.lm.distances.12.unordered<- gam(distcentroid~ s(min.10.pH, k=11)+ Food.quality + s(min.10.pH, by=oFood.quality, k=11),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
 summary(gam.lm.distances.12.unordered)
 
 fam.gam.distances <- family(gam.lm.distances.12)
@@ -2722,7 +2721,7 @@ ilink.gam.distances
 
 
 mod.distances<-gam.lm.distances.12
-ndata.distances <- with(food.exp.data.12.2019_zscores, data_frame(min.10.pH = seq(min(min.10.pH), max(min.10.pH),
+ndata.distances <- with(food.exp.data.12.2019_zscores, tibble(min.10.pH = seq(min(min.10.pH), max(min.10.pH),
                                                                              length = 100),  oFood.quality = oFood.quality[want],  CO2= CO2[want]))
 
 
@@ -2748,8 +2747,8 @@ ndata.distances$min.10.pH.unscaled<-ndata.distances$min.10.pH * attr(food.exp.da
 plt.distances <- ggplot(ndata.distances, aes(x = min.10.pH.unscaled, y = fit)) + 
   theme_classic()+
   geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y =(distances), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Homogeneity of multivariate dispersions\n(distance to multivariate centroid)")+  
+  geom_point(aes(y =(distcentroid), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Heterogeneity of multivariate dispersions\n(distance to multivariate centroid)")+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
@@ -2816,8 +2815,8 @@ caprellid_dry_biomass.gam <- summary(gam.gamma.caprellid_dry_biomass.12)
 tunicate_dry_biomass.gam <- summary(gam.gamma.tunicate_dry_biomass.12)
 tunicate_dry_biomass.gam.unordered <- summary(gam.gamma.tunicate_dry_biomass.12.unordered)
 
-rest_dry_biomass.gam.unordered <- summary(gam.gamma.rest_dry_biomass.12.unordered)
-rest_dry_biomass.gam <- summary(gam.gamma.rest_dry_biomass.12)
+rest_dry_biomass.gam.unordered <- summary(gam.tweedie.rest_dry_biomass.12.unordered)
+rest_dry_biomass.gam <- summary(gam.tweedie.rest_dry_biomass.12)
 
 hydtobot_dry_biomass.gam.unordered<-summary(gam.beta.hydtobot_dry_biomass.12.unordered)
 hydtobot_dry_biomass.gam<-summary(gam.beta.hydtobot_dry_biomass.12)

@@ -1,3 +1,4 @@
+#read in packages
 library(vegan)
 library(ggplot2)
 library(betapart)
@@ -5,25 +6,27 @@ library(bipartite)
 library(car)
 library(fitdistrplus)
 
-## For sp div and richness use nudi.combined but for community level use nudi.separated
+## read in data from both mesocosms and tiles
 food.exp.data.mesocosm<-read.csv("C:Data//Mesocosm inventory data//mesocosm_inventory_counts.csv", stringsAsFactors = FALSE, na.strings = c("NA","") )
 head(food.exp.data.mesocosm)
 
 mesocosm.key<-read.csv("C:Data//Percent cover data//Environmental files for community analysis//mesocosm_key.csv", stringsAsFactors = FALSE, na.strings = c("NA","") )
 food.exp.data.tile.all<-read.csv("C:Data//Percent cover data//Percent cover files over time//tile_week_12_all.csv" ,stringsAsFactors = FALSE, na.strings = c("NA","") )
 head(food.exp.data.tile.all)
-food.exp.data.mesocosm<-read.csv("C:Data//Mesocosm inventory data//mesocosm_inventory_counts.csv",stringsAsFactors = FALSE, na.strings = c("NA","") )
 
-food.exp.data.mesocosm.12<-read.csv("C:Data//Mesocosm inventory data//food.exp.data.mesocosm.12.csv", stringsAsFactors = FALSE, na.strings = c("NA","") )
+food.exp.data.mesocosm.12<-read.csv("c:Data//Mesocosm inventory data//food.exp.data.mesocosm.12.original.csv", stringsAsFactors = FALSE, na.strings = c("NA","") )
 head(food.exp.data.mesocosm.12)
-food.exp.data.mesocosm.12<-food.exp.data.mesocosm.12[,-c(1:3)]
 
-#combination of food.exp.data.mesocosm and meso.key and then combo tiles... 
 
-#cover = formicula, hydroid, bortyllus, membranipora, caprellid, bowerbankia, brown sponge
+#Select data to be used: 
+# some cover and some counts: 
+
+
+#cover 
 names_food_exp_tile<-c("Mesocosm", "formicula", "hydroid", "alive.bot", "alive.mem" , "caprellid" ,"bowerbankia" )
 
-names_counts_mesocosm<-c("num.nudi.eggs" ,
+#counts
+names_counts_mesocosm<-c("Mesocosm","num.nudi.eggs" ,
                           "num.nudi" ,
                           "mussel_complete" ,
                           "brown_sponge" ,
@@ -46,8 +49,7 @@ names_counts_mesocosm<-c("num.nudi.eggs" ,
                           
 
 
-
-
+#For sp div and richness use nudi.combined but for community level use nudi.separated
 #don't include these b/c 0 at week 12
 #which( colnames(food.exp.data.tile.all)=="corambe.nudis" )
 #which( colnames(food.exp.data.tile.all)=="num.flatworm" )
@@ -57,55 +59,26 @@ names_counts_mesocosm<-c("num.nudi.eggs" ,
 #which( colnames(food.exp.data.mesocosm.12)=="pres.brown.sponge" )
 #which( colnames(food.exp.data.mesocosm.12)=="seastar.eva" )
 
-species.rec_cover <- cbind(food.exp.data.tile.all[,colnames(food.exp.data.tile.all) %in% names_food_exp_tile], 
-                           food.exp.data.mesocosm.12[,colnames(food.exp.data.mesocosm.12) %in% names_counts_mesocosm])
-head(species.rec_cover)
-row.names(species.rec_cover)<-species.rec_cover$Mesocosm
-species.rec_cover<-species.rec_cover[,-1]
+food.exp.data.tile.selected<-food.exp.data.tile.all[,colnames(food.exp.data.tile.all) %in% names_food_exp_tile]
+head(food.exp.data.tile.selected)
+food.exp.data.mesocosm.selected<-food.exp.data.mesocosm.12[,colnames(food.exp.data.mesocosm.12) %in% names_counts_mesocosm]
+head(food.exp.data.mesocosm.selected)
 
-just.species.rec_cover<- species.rec_cover
+#community level data combined counts and percent cover
+species.rec_cover <- merge(food.exp.data.tile.selected, food.exp.data.mesocosm.selected)
+head(species.rec_cover)
+
+just.species.rec_cover<- species.rec_cover[,-1]
 head(just.species.rec_cover)
 
 
 # New dataframes for other analyses ---------------------------------------
 
-##########making a new one for use in PRC analysis - need sto be right ordeR:
 
-species.rec_cover_2 <- cbind(food.exp.data.tile.all[,c(1,8,9,11,12,21)], 
-                             food.exp.data.mesocosm.12[, c(51,50)], 
-                             food.exp.data.tile.all[,c(25)],
-                             food.exp.data.mesocosm.12[,c(49,54,48)],
-                             food.exp.data.tile.all[,c(38)],
-                             food.exp.data.mesocosm.12[,c(41,38,39,47,42,37,46)],
-                             food.exp.data.tile.all[,c(66)],
-                             food.exp.data.mesocosm.12[,c(45)],
-                             food.exp.data.tile.all[,c(68,69)],
-                             food.exp.data.mesocosm.12[,c(53,44,16,15,18,22,25)])
-
-head(species.rec_cover_2)  
-names(species.rec_cover_2)[9]<-"corambe.nudis"
-names(species.rec_cover_2)[7]<-"nudi.eggs"
-names(species.rec_cover_2)[8]<-"nudi"
-names(species.rec_cover_2)[10]<-"mussel"
-names(species.rec_cover_2)[11]<-"sponge.brown"
-names(species.rec_cover_2)[13]<-"bowerbankia"
-names(species.rec_cover_2)[15]<-"num.schizo"
-names(species.rec_cover_2)[16]<-"num.disporella"
-names(species.rec_cover_2)[21]<-"num.flatworm"
-names(species.rec_cover_2)[22]<-"num.anemone"
-names(species.rec_cover_2)[24]<-"white.worm"
-names(species.rec_cover_2)[26]<-"num.orange.sponge"
-
-
-
-write.csv(species.rec_cover_2,"C:Data//Mesocosm inventory data/species.rec_cover_mesocosm_12.csv")
-
-
-
-##### making a newdataframe for % cover only - to be used for evenness and shannon diversity ... but has to have 0.5 for the right ones. 
+##### making a newdataframe for % cover only - to be used for evenness and shannon diversity
 head(food.exp.data.tile.all)
 
-names_cover_food_exp_tile<-c("formicula" ,
+names_cover_food_exp_tile<-c("Mesocosm","formicula" ,
                             "hydroid" ,
                             "alive.bot" ,
                             "alive.mem" ,
@@ -133,22 +106,20 @@ names_cover_food_exp_tile<-c("formicula" ,
 
 species.cover <- food.exp.data.tile.all[,colnames(food.exp.data.tile.all) %in% names_cover_food_exp_tile]
 head(species.cover)
-just.species.cover<-species.cover
+just.species.cover<-species.cover[,-1]
 
 species.cover$richness<-specnumber(just.species.cover)
 species.cover$shannon.diversity<-diversity(just.species.cover, index="shannon")
 species.cover$evenness<-species.cover$shannon.diversity/(log(species.cover$richness))
+
+#evenness has to be created from just cover data
 food.exp.data.mesocosm.12$evenness<-species.cover$evenness
 
+#richness can be from count data - it's just pres/abs of given species
 food.exp.data.mesocosm.12$richness <- specnumber(just.species.rec_cover)
-
-write.csv(food.exp.data.mesocosm.12,"C:Data//Mesocosm inventory data/food.exp.data.mesocosm.12.csv")
 
 
 # MDS ---------------------------------------------------------------------
-
-
-##read in environment dataset##
 
 compiled.data <- mesocosm.key
 head(compiled.data)
@@ -158,21 +129,11 @@ row.names(compiled.data)<-compiled.data$Mesocosm
 head(compiled.data)
 compiled.data$Combined.Treatment<-as.factor(compiled.data$Combined.Treatment) 
 
-
-
-all.data.rec_cover<-cbind(just.species.rec_cover,compiled.data)
-
-
-
-################################
-
+#Combinging species and environment
+all.data.rec_cover<-merge(species.rec_cover,compiled.data)
+head(all.data.rec_cover)
 
 cbbPalette.all.2<- c( "#F8766D", "#F8766D", "#00BA38" , "#00BA38", "#619CFF", "#619CFF")
-cbbPalette.all.3<- c( "#F8766D","#00BA38" , "#619CFF")
-
-cbbPalette.all.2.control<- c( "#F8766D", "#FFFFFF", "#00BA38" , "#FFFFFF", "#619CFF", "#FFFFFF")
-
-cbbPalette.all<- c( "#F8766D", "#00BA38", "#619CFF", "#F8766D", "#00BA38", "#619CFF")
 
 ###CONSTRAINED Ordination
 
@@ -184,25 +145,22 @@ capscale_plot<- function(m, colorby){
   #ordisurf(m ~ min.10.pH, data=compiled.data_zscores, method = "REML", select = TRUE)
   points(m, col = cols[colorby], pch = shapesies[colorby], cex=1.5)
   legend("topright", title ="Food  CO2", legend=levels(colorby), col=cols, pch = shapesies, cex=1)
-  comm=species.rec_cover_jacc
-
 }
 
 
-# need to rescale variables.... 
-# need to have zscores at least for pH ... otherwise evaluating at 0 but not meaningful ... need to do something to resp. variables... 
+# need to have zscores for pH ... otherwise evaluating at ph=0 which is not meaningful 
 compiled.data_zscores<-compiled.data
 compiled.data_zscores$min.10.pH<-scale(compiled.data$min.10.pH, center=TRUE, scale=TRUE)
 head(compiled.data_zscores)
 
 
 
-# Bray-Curtis -------------------------------------------------------------
+# Bray-Curtis Capscale / constrained ordination -------------------------------------------------------------
 
-#Standardizing by total of the species ... makes each one on their own scale... 
+#Standardizing by total of the species either percent or count
+# This makes each species on their own scale, so the mesocosm got x % of the total mussels for eg.
+standardized.species.rec_cover<-decostand(just.species.rec_cover, method="total", MARGIN=2)
 head(standardized.species.rec_cover)
-
-standardized.species.rec_cover<-decostand(species.rec_cover, method="total", MARGIN=2)
 
 model.meso.bray<-capscale(standardized.species.rec_cover ~ min.10.pH*Food.quality,compiled.data_zscores , distance="bray")
 capscale_plot(model.meso.bray, colorby=compiled.data$Combined.Treatment)
@@ -215,46 +173,23 @@ summary(model.meso.bray)
 
 model.meso.bray.scores<- as.data.frame(scores(model.meso.bray)$sites)
 head(model.meso.bray.scores)
-model.meso.bray.scores$Mesocosm<-row.names(model.meso.bray.scores)
+model.meso.bray.scores$Mesocosm<-species.rec_cover$Mesocosm
+#Can't do it by row number because missing mesocosm #46
+
 model.meso.bray.scores.CAP<-merge(model.meso.bray.scores, compiled.data, by="Mesocosm")
 head(model.meso.bray.scores.CAP)
 
-plot.CAP1.12.hydrogen<- ggplot(model.meso.bray.scores.CAP, aes(x=min.10.pH, y=CAP1, colour=Food.quality)) + geom_point(size=5,aes(colour=factor(Food.quality), shape=CO2)) + guides(fill=FALSE) + scale_fill_manual(values=cbbPalette.all)+ geom_smooth(aes(col=Food.quality, fill=Food.quality), alpha=0.15,size=1.5, method="lm") +scale_shape_manual(values=c(19,17))
-plot.CAP1.12.hydrogen<- plot.CAP1.12.hydrogen + theme_bw() +  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("CAP1 (36% of constrained variation)")  + theme(text = element_text(size=16), axis.text = element_text(size=16))+theme(axis.title.y = element_text(angle=90))#+ylim(0,0.75)
-plot.CAP1.12.hydrogen<- plot.CAP1.12.hydrogen + theme(legend.text = element_text(colour="black", size = 16))+ theme(legend.title = element_text(colour="black", size=16))+theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.line=element_line(size=0.25), axis.ticks.length=unit(-0.25, "cm") )
-plot.CAP1.12.hydrogen<- plot.CAP1.12.hydrogen+ theme(legend.position="none")+ scale_colour_discrete(name = "Food.quality")+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))
-plot.CAP1.12.hydrogen 
+write.csv(model.meso.bray.scores,"C:Data//Mesocosm inventory data//model.meso.bray.scores.csv", row.names=FALSE)
 
-
-write.csv(model.meso.bray.scores,"C:Data//Mesocosm inventory data//model.meso.bray.scores.csv")
+food.exp.data.mesocosm.12<-merge(model.meso.bray.scores,food.exp.data.mesocosm.12)
 
 
 
-head(standardized.species.rec_cover)
+# betadispersion partitioned ----------------------------------------------
 
-### betadispersion 
-dist_bray <- vegdist(standardized.species.rec_cover, method = "bray")
-mod.meso.bray.Combined.Treatment<-betadisper(dist_bray, compiled.data_zscores$Combined.Treatment, type="centroid")
-permutest(mod.meso.bray.Combined.Treatment)
-
-boxplot(mod.meso.bray.Combined.Treatment$distances ~ compiled.data_zscores$Combined.Treatment)
-
-head(mod.meso.bray.Combined.Treatment)
-
-mod.meso.bray.CO2<-betadisper(dist_bray, compiled.data_zscores$CO2, type="centroid")
-permutest(mod.meso.bray.CO2)
-
-boxplot(mod.meso.bray.CO2$distances ~ compiled.data_zscores$CO2)
-
-mod.meso.bray.Food.quality<-betadisper(dist_bray, compiled.data_zscores$Food.quality, type="centroid")
-permutest(mod.meso.bray.Food.quality)
-
-
-#betadispersion partitioned
 
 dist.part.bray<-bray.part(standardized.species.rec_cover)
 #returns a distance matrix, pairwise between site values of each component of beta diversitity 
-#this is the right order .. but tunrover needs to be called "balanced vairation in species abundances" and nestedness "abundance gradient" 
 bd.bray<-betadisper(dist.part.bray[[3]],compiled.data_zscores$Combined.Treatment, type="centroid" )
 bd.nestedness.bray<-betadisper(dist.part.bray[[2]],compiled.data_zscores$Combined.Treatment, type="centroid")
 bd.turnover.bray<-betadisper(dist.part.bray[[1]],compiled.data_zscores$Combined.Treatment, type="centroid")
@@ -273,42 +208,11 @@ plot(bd.turnover.bray)
 anova(bd.turnover.bray)
 boxplot(bd.turnover.bray)
 
-str(bd.turnover.bray)
-
-bd.turnover.bray$distances
-
-
-bd.turnover.bray.distances<- as.data.frame(bd.turnover.bray$distances)
-head(bd.turnover.bray.distances)
-bd.turnover.bray.distances$distcentroid<-bd.turnover.bray.distances$`bd.turnover.bray$distances`
-bd.turnover.bray.distances$Mesocosm<-row.names(bd.turnover.bray.distances)
-bd.turnover.bray.distances.2<-merge(bd.turnover.bray.distances, compiled.data, by="Mesocosm")
-head(bd.turnover.bray.distances.2)
-
-plot.turnover.distcentroid.12.hydrogen<- ggplot(bd.turnover.bray.distances.2, aes(x=min.10.pH, y=distcentroid, colour=Food.quality)) + geom_point(size=5,aes(colour=factor(Food.quality), shape=CO2)) + guides(fill=FALSE) + scale_fill_manual(values=cbbPalette.all)+ geom_smooth(aes(col=Food.quality, fill=Food.quality), alpha=0.15,size=1.5, method="lm") +scale_shape_manual(values=c(19,17))
-plot.turnover.distcentroid.12.hydrogen<- plot.turnover.distcentroid.12.hydrogen + theme_bw() +  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Turnover")  + theme(text = element_text(size=16), axis.text = element_text(size=16))+theme(axis.title.y = element_text(angle=90))#+ylim(0,0.75)
-plot.turnover.distcentroid.12.hydrogen<- plot.turnover.distcentroid.12.hydrogen + theme(legend.text = element_text(colour="black", size = 16))+ theme(legend.title = element_text(colour="black", size=16))+theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.line=element_line(size=0.25), axis.ticks.length=unit(-0.25, "cm") )
-plot.turnover.distcentroid.12.hydrogen<- plot.turnover.distcentroid.12.hydrogen+ theme(legend.position="none")+ scale_colour_discrete(name = "Food.quality")+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))
-plot.turnover.distcentroid.12.hydrogen
-
-bd.nestedness.bray.distances<- as.data.frame(bd.nestedness.bray$distances)
-head(bd.nestedness.bray.distances)
-bd.nestedness.bray.distances$distcentroid<-bd.nestedness.bray.distances$`bd.nestedness.bray$distances`
-bd.nestedness.bray.distances$Mesocosm<-row.names(bd.nestedness.bray.distances)
-bd.nestedness.bray.distances.2<-merge(bd.nestedness.bray.distances, compiled.data, by="Mesocosm")
-head(bd.nestedness.bray.distances.2)
-
-plot.nestedness.distcentroid.12.hydrogen<- ggplot(bd.nestedness.bray.distances.2, aes(x=min.10.pH, y=distcentroid, colour=Food.quality)) + geom_point(size=5,aes(colour=factor(Food.quality), shape=CO2)) + guides(fill=FALSE) + scale_fill_manual(values=cbbPalette.all)+ geom_smooth(aes(col=Food.quality, fill=Food.quality), alpha=0.15,size=1.5, method="lm") +scale_shape_manual(values=c(19,17))
-plot.nestedness.distcentroid.12.hydrogen<- plot.nestedness.distcentroid.12.hydrogen + theme_bw() +  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Nestedness")  + theme(text = element_text(size=16), axis.text = element_text(size=16))+theme(axis.title.y = element_text(angle=90))#+ylim(0,0.75)
-plot.nestedness.distcentroid.12.hydrogen<- plot.nestedness.distcentroid.12.hydrogen + theme(legend.text = element_text(colour="black", size = 16))+ theme(legend.title = element_text(colour="black", size=16))+theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.line=element_line(size=0.25), axis.ticks.length=unit(-0.25, "cm") )
-plot.nestedness.distcentroid.12.hydrogen<- plot.nestedness.distcentroid.12.hydrogen+ theme(legend.position="none")+ scale_colour_discrete(name = "Food.quality")+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))
-plot.nestedness.distcentroid.12.hydrogen
-
 
 bd.overall.bray.distances<- as.data.frame(bd.bray$distances)
 head(bd.overall.bray.distances)
 bd.overall.bray.distances$distcentroid<-bd.overall.bray.distances$`bd.bray$distances`
-bd.overall.bray.distances$Mesocosm<-row.names(bd.overall.bray.distances)
+bd.overall.bray.distances$Mesocosm<-species.rec_cover$Mesocosm
 bd.overall.bray.distances.2<-merge(bd.overall.bray.distances, compiled.data, by="Mesocosm")
 head(bd.overall.bray.distances.2)
 
@@ -318,165 +222,11 @@ plot.overall.distcentroid.12.hydrogen<- plot.overall.distcentroid.12.hydrogen + 
 plot.overall.distcentroid.12.hydrogen<- plot.overall.distcentroid.12.hydrogen+ theme(legend.position="none")+ scale_colour_discrete(name = "Food.quality")+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))
 plot.overall.distcentroid.12.hydrogen 
 
+write.csv(bd.overall.bray.distances.2,"C:Data//Mesocosm inventory data/bd.overall.bray.distances.2.csv",row.names=FALSE )
+
+food.exp.data.mesocosm.12<-merge(bd.overall.bray.distances,food.exp.data.mesocosm.12)
+head(food.exp.data.mesocosm.12)
+
+write.csv(food.exp.data.mesocosm.12,"C:Data//Mesocosm inventory data/food.exp.data.mesocosm.12.csv", row.names=FALSE)
 
 
-write.csv(bd.overall.bray.distances.2,"C:Data//Mesocosm inventory data/bd.overall.bray.distances.2.csv")
-
-
-# mvabund -----------------------------------------------------------------
-library(mvabund)
-par(mar=c(2,10,2,2)) # adjusts the margins
-head(standardized.species.rec_cover)
-Norah_spp <- mvabund(standardized.species.rec_cover)
-plot(Norah_spp~model.meso.bray.scores.CAP$Combined.Treatment, cex.axis=0.8, cex=0.8)
-
-meanvar.plot(Norah_spp)
-
-mod1 <- manylm(Norah_spp ~ compiled.data_zscores$min.10.pH*compiled.data_zscores$Food.quality)
-
-plot(mod1)
-anova(mod1)
-#problem wit hthe residuals vs fitter - but alot the plot doesn't quite fit.... 
-
-
-
-
-
-# Correlation -------------------------------------------------------------
-
-
-library(ggcorrplot)
-library(corrr)
-library(PerformanceAnalytics)
-library(cooccur)
-
-
-
-
-corr_species<-round(cor(species.rec_cover, use="pairwise.complete.obs"), 1)
-head(corr_species[, 1:6])
-p.mat_species <- cor_pmat(corr_species)
-head(p.mat_species[, 1:4])
-
-ggcorrplot(corr_species)
-ggcorrplot(corr_species, hc.order = TRUE, type = "lower",
-           outline.col = "white")
-ggcorrplot(corr_species, hc.order = TRUE,
-           type = "lower", p.mat = p.mat_species)
-
-ggcorrplot(corr_species, hc.order = TRUE, type = "lower",
-           lab = TRUE)
-
-
-#cooccur package
-head(species.rec_cover_jacc)
-species.rec_cover_jacc_transpose<-t(species.rec_cover_jacc)
-
-cooccur.species <- cooccur(mat = species.rec_cover_jacc_transpose, type = "spp_site", thresh = TRUE, spp_names = TRUE)
-summary(cooccur.species)
-prob.table(cooccur.species)
-plot(cooccur.species)
-
-pair(mod=cooccur.species, "3")
-
-pair.attributes(mod=cooccur.species)
-pair.profile(mod=cooccur.species)
-
-obs.v.exp(cooccur.species)
-
-
-#netassoc package
-library(netassoc)
-head(species.rec_cover)
-str(species.rec_cover)
-species.rec_cover_int <- species.rec_cover %>% transform(hydroid = as.integer(hydroid), 
-                                alive.bot= as.integer(alive.bot),
-                                alive.mem= as.integer(alive.mem),
-                                caprellid= as.integer(caprellid))
-str(species.rec_cover_int)
-
-obs<-t(species.rec_cover_int)
-str(obs)
-
-n<-make_netassoc_network(obs, nul=vegan::permatfull(obs)$perm[[1]],
-                      method="partial_correlation", args=list(method="shrinkage",verbose=FALSE),
-                      p.method="fdr", alpha=0.05, numnulls=1000,
-                      plot=TRUE,plot.legend=TRUE, plot.title=TRUE, verbose=TRUE)
-
-
-
-plot_netassoc_network (n$network_all)
-
-plot(n$matrix_spsp_obs)
-n$network_all
-
-spxsp<-pairwise_association(obs, method = "condentropy")
-image(spxsp)
-
-#############################
-
-
-
-#Simper
-#The simper functions performs pairwise comparisons of groups of sampling units 
-#and finds the average contributions of each species to the average overall Bray-Curtis dissimilarity between sites
-
-#The results of simper can be very difficult to interpret. 
-#The method very badly confounds the mean between group differences and within group variation, 
-#and seems to single out variable species instead of distinctive species (Warton et al. 2012). 
-#Even if you make groups that are copies of each other, the method will single out species with high contribution, 
-#but these are not contributions to non-existing between-group differences 
-#but to within-group variation in species abundance.
-
-
-sim <- with(compiled.data, simper(species.rec_cover,CO2))
-summary(sim)
-simper(species.rec_cover,compiled.data$CO2, permutations = 0, trace = FALSE)
-
-?mvabund
-#mvabund - not sure how useful
-install.packages("mvabund")
-library(mvabund)
-species.rec_cover.mvabund<-mvabund(species.rec_cover)
-plot(species.rec_cover.mvabund ~ compiled.data$Combined.Treatment)
-
-
-##### Indval
-###"The indval approach looks for species.rec_cover that are
-#both necessary and sufficient, i.e. if you find that species.rec_cover you should be in that type,
-#and if you are in that type you should find that species.rec_cover
-install.packages("labdsv")
-library(labdsv)
-iva<-indval(species.rec_cover,compiled.data$Combined.Treatment)
-
-#### indv val is indicative of fidelity of that species.rec_cover to a particular site
-#### 1 - mv abunda - 2- indval? 
- 
-
-iva$relfrq
-iva$relabu
-iva$indval
-
-gr<- iva$maxcls[iva$pval<=0.05]
-iv<- iva$indcls[iva$pval<=0.05]
-pv<- iva$pval[iva$pval<=0.05]
-fr<-apply(species.rec_cover>0, 2, sum)[iva$pval<=0.05]
-fidg<-data.frame(group=gr, indval=iv, pvalue=pv, freq=fr)
-fidg<-fidg[order(fidg$group,-fidg$indval), ]
-fidg
-
-
-
-
-?isamic
-#Indicator Species Analysis Minimizing Intermediate Occurrences
-#Calculates the degree to which species are either always present or always absent within clusters or types.
-###do to break down into each part of combined. treatment ... Or just co2 vs just air
-isamic(species.rec_cover,compiled.data$Combined.Treatment, sort=TRUE)
-
- 
-#october 7, 2018
-# Gower - is good for dimensionally heterogeneous variables
-model.meso.gower<-capscale(species.rec_cover ~ min.10.pH*Food.quality,compiled.data , distance="gower")
-capscale_plot(model.meso.gower, colorby=compiled.data$Combined.Treatment)
-adonis(species.rec_cover ~ min.10.pH*Food.quality, method="gower", permutations = 9999, data=compiled.data)
