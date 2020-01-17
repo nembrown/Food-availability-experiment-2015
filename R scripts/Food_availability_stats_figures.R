@@ -53,6 +53,10 @@ library(installr)
 food.exp.data.12.2019<-read.csv("C:Data//Mesocosm inventory data//food.exp.data.mesocosm.12.csv")
 food.exp.data.tile.all<-read.csv("C:Data//Mesocosm inventory data//food.exp.data.tile.all.csv")
 food.caprellid.data<-read.csv("C:Data//Emily caprellid data.csv", stringsAsFactors = FALSE, na.strings = c("NA","") )
+bd.overall.bray.distances.2<-read.csv("C:Data//Mesocosm inventory data//bd.overall.bray.distances.2.csv")
+model.meso.bray.scores<-read.csv("C:Data//Mesocosm inventory data//model.meso.bray.scores.csv")
+
+
 
 #ordered and unordered factors
 food.exp.data.12.2019$oFood.quality<-factor(food.exp.data.12.2019$Food.quality, levels=c("None", "Low", "High"), ordered=TRUE)
@@ -87,7 +91,8 @@ food.exp.data.12.2019$hydtobot_dry_biomass<-(food.exp.data.12.2019$tunicate_dry_
 
 #read in community data from other file
 food.exp.data.12.2019$CAP1<-model.meso.bray.scores$CAP1
-food.exp.data.12.2019$distances<-bd.bray$distances
+food.exp.data.12.2019$distances<-#### not in right order! bd.overall.bray.distances.2$distcentroid
+  ### 
 
 food.exp.data.12.2019$Mussel.wet.weight.per.1<-(food.exp.data.12.2019$Mussel.wet.weight)/(food.exp.data.12.2019$mussel_complete+1)
 

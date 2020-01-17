@@ -16,10 +16,12 @@ food.exp.data.mesocosm<-read.csv("C:Data//Mesocosm inventory data//mesocosm_inve
 
 food.exp.data.mesocosm.12<-read.csv("C:Data//Mesocosm inventory data//food.exp.data.mesocosm.12.csv", stringsAsFactors = FALSE, na.strings = c("NA","") )
 head(food.exp.data.mesocosm.12)
+food.exp.data.mesocosm.12<-food.exp.data.mesocosm.12[,-c(1:3)]
+
 #combination of food.exp.data.mesocosm and meso.key and then combo tiles... 
 
 #cover = formicula, hydroid, bortyllus, membranipora, caprellid, bowerbankia, brown sponge
-names_food_exp_tile<-c("formicula", "hydroid", "alive.bot", "alive.mem" , "caprellid" ,"bowerbankia" )
+names_food_exp_tile<-c("Mesocosm", "formicula", "hydroid", "alive.bot", "alive.mem" , "caprellid" ,"bowerbankia" )
 
 names_counts_mesocosm<-c("num.nudi.eggs" ,
                           "num.nudi" ,
@@ -51,14 +53,12 @@ names_counts_mesocosm<-c("num.nudi.eggs" ,
 #which( colnames(food.exp.data.tile.all)=="num.flatworm" )
 #which( colnames(food.exp.data.tile.all)=="num.isopod" )
 #which( colnames(food.exp.data.tile.all)=="white.worm.1" )
-
 #changed these two:
 #which( colnames(food.exp.data.mesocosm.12)=="pres.brown.sponge" )
 #which( colnames(food.exp.data.mesocosm.12)=="seastar.eva" )
 
-#53,52,51,46,50,42,39,40,49,38,48,47,55,45,17,16,19,23,26
-
-species.rec_cover <- cbind(food.exp.data.tile.all[,c(1,8,9,11,12,21,38)], food.exp.data.mesocosm.12[,c(55,54,53,48,52,44,41,42,51,45,40,50,57,47,19,18,21,25,28,49)])
+species.rec_cover <- cbind(food.exp.data.tile.all[,colnames(food.exp.data.tile.all) %in% names_food_exp_tile], 
+                           food.exp.data.mesocosm.12[,colnames(food.exp.data.mesocosm.12) %in% names_counts_mesocosm])
 head(species.rec_cover)
 row.names(species.rec_cover)<-species.rec_cover$Mesocosm
 species.rec_cover<-species.rec_cover[,-1]
@@ -104,34 +104,34 @@ write.csv(species.rec_cover_2,"C:Data//Mesocosm inventory data/species.rec_cover
 
 ##### making a newdataframe for % cover only - to be used for evenness and shannon diversity ... but has to have 0.5 for the right ones. 
 head(food.exp.data.tile.all)
-paste(
-  which( colnames(food.exp.data.tile.all)=="formicula" ),
-  which( colnames(food.exp.data.tile.all)=="hydroid" ),
-  which( colnames(food.exp.data.tile.all)=="alive.bot" ),
-  which( colnames(food.exp.data.tile.all)=="alive.mem" ),
-  which( colnames(food.exp.data.tile.all)=="caprellid" ),
-  which( colnames(food.exp.data.tile.all)=="nudi.eggs" ),
-  which( colnames(food.exp.data.tile.all)=="nudi" ),
-  which( colnames(food.exp.data.tile.all)=="corambe.nudis" ),
-  which( colnames(food.exp.data.tile.all)=="mussel" ),
-  which( colnames(food.exp.data.tile.all)=="sponge.brown" ),
-  which( colnames(food.exp.data.tile.all)=="didemnum" ),
-  which( colnames(food.exp.data.tile.all)=="bowerbankia" ),
-  which( colnames(food.exp.data.tile.all)=="corella" ),
-  which( colnames(food.exp.data.tile.all)=="schizo" ),
-  which( colnames(food.exp.data.tile.all)=="disporella" ),
-  which( colnames(food.exp.data.tile.all)=="serpulid" ),
-  which( colnames(food.exp.data.tile.all)=="alive.barn" ),
-  which( colnames(food.exp.data.tile.all)=="cribrilina" ),
-  which( colnames(food.exp.data.tile.all)=="flatworm" ),
-  which( colnames(food.exp.data.tile.all)=="anemone" ),
-  which( colnames(food.exp.data.tile.all)=="isopod" ),
-  which( colnames(food.exp.data.tile.all)=="white.worm" ),
-  which( colnames(food.exp.data.tile.all)=="seastar" ),
-  sep=","
-)
 
-species.cover <- food.exp.data.tile.all[,c(8,9,11,12,21,23,24,25,28,29,31,38,10,13,14,20,26,30,33,34,35,36,37)]
+names_cover_food_exp_tile<-c("formicula" ,
+                            "hydroid" ,
+                            "alive.bot" ,
+                            "alive.mem" ,
+                            "caprellid" ,
+                            "nudi.eggs" ,
+                            "nudi" ,
+                            "corambe.nudis",
+                            "mussel" ,
+                            "sponge.brown" ,
+                            "didemnum" ,
+                            "bowerbankia" ,
+                            "corella" ,
+                            "schizo" ,
+                            "disporella" ,
+                            "serpulid" ,
+                            "alive.barn" ,
+                            "cribrilina" ,
+                            "flatworm" ,
+                            "anemone" ,
+                            "isopod" ,
+                            "white.worm" ,
+                            "seastar" )
+
+
+
+species.cover <- food.exp.data.tile.all[,colnames(food.exp.data.tile.all) %in% names_cover_food_exp_tile]
 head(species.cover)
 just.species.cover<-species.cover
 
@@ -188,225 +188,16 @@ capscale_plot<- function(m, colorby){
 
 }
 
-#can I addd arrows? 
-#scores(m,display="sp")
-#arrows(m, "species") # not this one exactly
 
-
-##October 11, 2018
-# need to rescazle variables.... 
+# need to rescale variables.... 
 # need to have zscores at least for pH ... otherwise evaluating at 0 but not meaningful ... need to do something to resp. variables... 
 compiled.data_zscores<-compiled.data
 compiled.data_zscores$min.10.pH<-scale(compiled.data$min.10.pH, center=TRUE, scale=TRUE)
 head(compiled.data_zscores)
 
-#shoulod do for spp too ... but not for multivariate, just for univariate stuff. 
-#head(species.rec_cover)
-#species.rec_cover_zscores<-species.rec_cover
-#species.rec_cover_zscores[1:26]<-lapply(species.rec_cover_zscores, function(x) {
-#  y<-scale(x, center=TRUE, scale=TRUE)
-#}
-#)
-#head(species.rec_cover_zscores)
-
-
-# Jaccard -----------------------------------------------------------------
-
-
-
-# Jaccard - answers the question - of community composition (regardless of abundance)
-species.rec_cover_jacc<-decostand(species.rec_cover, method="pa")
-
-?capscale
-
-
-model.meso.jac<-capscale(species.rec_cover_jacc ~ min.10.pH*Food.quality,compiled.data_zscores , distance="jaccard", binary = TRUE)
-capscale_plot(model.meso.jac, colorby=compiled.data$Combined.Treatment)
-adonis(species.rec_cover_jacc ~ min.10.pH*Food.quality, method="jaccard", permutations = 9999, data=compiled.data_zscores, binary=TRUE)
-
-model.meso.jac.scores<- as.data.frame(scores(model.meso.jac)$sites)
-head(model.meso.jac.scores)
-model.meso.jac.scores$Mesocosm<-row.names(model.meso.jac.scores)
-model.meso.jac.scores.CAP<-merge(model.meso.jac.scores, compiled.data, by="Mesocosm")
-head(model.meso.jac.scores.CAP)
-
-plot.total.CAP1.12.hydrogen<- ggplot(model.meso.jac.scores.CAP, aes(x=min.10.pH, y=CAP1, colour=Food.quality)) + geom_point(size=5,aes(colour=factor(Food.quality), shape=CO2)) + guides(fill=FALSE) + scale_fill_manual(values=cbbPalette.all)+ geom_smooth(aes(col=Food.quality, fill=Food.quality), alpha=0.15,size=1.5, method="lm") +scale_shape_manual(values=c(19,17))
-plot.total.CAP1.12.hydrogen<- plot.total.CAP1.12.hydrogen + theme_bw() +  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("CAP1")  + theme(text = element_text(size=16), axis.text = element_text(size=16))+theme(axis.title.y = element_text(angle=90))#+ylim(0,0.75)
-plot.total.CAP1.12.hydrogen<- plot.total.CAP1.12.hydrogen + theme(legend.text = element_text(colour="black", size = 16))+ theme(legend.title = element_text(colour="black", size=16))+theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.line=element_line(size=0.25), axis.ticks.length=unit(-0.25, "cm") )
-plot.total.CAP1.12.hydrogen<- plot.total.CAP1.12.hydrogen+ theme(legend.position="none")+ scale_colour_discrete(name = "Food.quality")+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))
-plot.total.CAP1.12.hydrogen <-plot.total.CAP1.12.hydrogen +  scale_x_reverse( breaks=c(10^-7.0,10^-7.2,10^-7.4,10^-7.6, 10^-7.8), labels=c(7.0, 7.2, 7.4, 7.6, 7.8))
-plot.total.CAP1.12.hydrogen 
-library(ggplot2)
-
-plot.total.CAP2.12.hydrogen<- ggplot(model.meso.jac.scores.CAP, aes(x=min.10.pH, y=CAP2, colour=Food.quality)) + geom_point(size=5,aes(colour=factor(Food.quality), shape=CO2)) + guides(fill=FALSE) + scale_fill_manual(values=cbbPalette.all)+ geom_smooth(aes(col=Food.quality, fill=Food.quality), alpha=0.15,size=1.5, method="lm") +scale_shape_manual(values=c(19,17))
-plot.total.CAP2.12.hydrogen<- plot.total.CAP2.12.hydrogen + theme_bw() +  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("CAP2")  + theme(text = element_text(size=16), axis.text = element_text(size=16))+theme(axis.title.y = element_text(angle=90))#+ylim(0,0.75)
-plot.total.CAP2.12.hydrogen<- plot.total.CAP2.12.hydrogen + theme(legend.text = element_text(colour="black", size = 16))+ theme(legend.title = element_text(colour="black", size=16))+theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.line=element_line(size=0.25), axis.ticks.length=unit(-0.25, "cm") )
-plot.total.CAP2.12.hydrogen<- plot.total.CAP2.12.hydrogen+ theme(legend.position="none")+ scale_colour_discrete(name = "Food.quality")+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))
-plot.total.CAP2.12.hydrogen <-plot.total.CAP2.12.hydrogen +  scale_x_reverse( breaks=c(10^-7.0,10^-7.2,10^-7.4,10^-7.6, 10^-7.8), labels=c(7.0, 7.2, 7.4, 7.6, 7.8))
-plot.total.CAP2.12.hydrogen 
-
-
-
-# Betadiversity -----------------------------------------------------------
-
-#using betadiver
-data(sipoo)
-m <- betadiver(species.rec_cover_jacc)
-plot(m)
-
-
-#betadispersion
-dist_jac <- vegdist(species.rec_cover_jacc, method = "jaccard", binary=TRUE)
-
-mod.meso.jac.Food.quality<-betadisper(dist_jac, compiled.data$Food.quality, type="centroid")
-anova(mod.meso.jac.Food.quality)
-
-
-mod.meso.jac.CO2<-betadisper(dist_jac, compiled.data$CO2, type="centroid")
-anova(mod.meso.jac.CO2)
-
-
-
-mod.meso.jac.Combined.Treatment<-betadisper(dist_jac, compiled.data$Combined.Treatment, type="centroid", bias.adjust=TRUE)
-anova(mod.meso.jac.Combined.Treatment)
-
-#plot_net?
-#web methods?
-install.packages("bipartite")
-library(bipartite)
-nestedrank(web, method = "NODF", weighted=TRUE, normalise=TRUE, return.matrix=FALSE)
-#web is a matrix with elements of a set (e.g., plants) as rows, elements of a second set (e.g., pollinators) as columns and number of interactions as entries.
-
-head(species.rec_cover)
-nested.matrix<-nestedrank(species.rec_cover, method = "NODF", weighted=TRUE, normalise=TRUE, return.matrix=FALSE)
-nested.matrixnon.normal<-nestedrank(species.rec_cover, method = "NODF", weighted=TRUE, normalise=FALSE, return.matrix=FALSE)
-
-?nestedrank
-
-nested.matrix$'lower level'
-
-
-model.meso.jac.scores.CAP$nestedness<-nested.matrix$'lower level'
-head(model.meso.jac.scores.CAP)
-model.meso.jac.scores.CAP$nestedness.nonnormal<-nested.matrixnon.normal$'lower level'
-
-plot.total.nestedness.12.hydrogen<- ggplot(model.meso.jac.scores.CAP, aes(x=min.10.pH, y=nestedness, colour=Food.quality)) + geom_point(size=5,aes(colour=factor(Food.quality), shape=CO2)) + guides(fill=FALSE) + scale_fill_manual(values=cbbPalette.all)+ geom_smooth(aes(col=Food.quality, fill=Food.quality), alpha=0.15,size=1.5, method="lm") +scale_shape_manual(values=c(19,17))
-plot.total.nestedness.12.hydrogen<- plot.total.nestedness.12.hydrogen + theme_bw() +  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("nestedness")  + theme(text = element_text(size=16), axis.text = element_text(size=16))+theme(axis.title.y = element_text(angle=90))#+ylim(0,0.75)
-plot.total.nestedness.12.hydrogen<- plot.total.nestedness.12.hydrogen + theme(legend.text = element_text(colour="black", size = 16))+ theme(legend.title = element_text(colour="black", size=16))+theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.line=element_line(size=0.25), axis.ticks.length=unit(-0.25, "cm") )
-plot.total.nestedness.12.hydrogen<- plot.total.nestedness.12.hydrogen+ theme(legend.position="none")+ scale_colour_discrete(name = "Food.quality")+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))
-plot.total.nestedness.12.hydrogen <-plot.total.nestedness.12.hydrogen +  scale_x_reverse( breaks=c(10^-7.0,10^-7.2,10^-7.4,10^-7.6, 10^-7.8), labels=c(7.0, 7.2, 7.4, 7.6, 7.8))
-plot.total.nestedness.12.hydrogen 
-
-
-
-
-multipart.jac<-beta.multi(species.rec_cover_jacc, index.family = "jaccard")
-head(multipart.jac)
-
-betasample.jac<-beta.sample(species.rec_cover_jacc, index.family="jaccard", sites=10, samples = 100)
-
-## Permutation test for F
-permutest(mod.meso.jac.Combined.Treatment, pairwise = TRUE, permutations = 999)
-
-## Tukey's Honest Significant Differences
-(mod.HSD <- TukeyHSD(mod.meso.jac.Combined.Treatment))
-plot(mod.HSD)
-
-#can't do by hydrogen b/c it's by groups.... 
-
-plot(dist.part.jac$beta.jac~compiled.data$min.10.pH)
-
-
-
-#betadispersion partitioned - do this by Food and CO2... 
-library(betapart)
-dist.part.jac<-beta.pair(species.rec_cover_jacc, index.family = "jaccard")
-
-#returns a distance matrix, pairwise between site values of each component of beta diversitity 
-bd.jac<-betadisper(dist.part.jac[[3]],compiled.data$Combined.Treatment)
-bd.nestedness.jac<-betadisper(dist.part.jac[[2]],compiled.data$Combined.Treatment)
-bd.turnover.jac<-betadisper(dist.part.jac[[1]],compiled.data$Combined.Treatment)
-
-dist.part.jac.core<-betapart.core(species.rec_cover_jacc)
-str(dist.part.jac.core)
-
-
-plot(bd.jac)
-anova(bd.jac)
-boxplot(bd.jac)
-
-plot(bd.nestedness.jac)
-anova(bd.nestedness.jac)
-boxplot(bd.nestedness.jac)
-
-plot(bd.turnover.jac)
-anova(bd.turnover.jac)
-boxplot(bd.turnover.jac)
-
-str(bd.turnover.jac)
-
-bd.turnover.jac$distances
-
-
-bd.turnover.jac.distances<- as.data.frame(bd.turnover.jac$distances)
-head(bd.turnover.jac.distances)
-bd.turnover.jac.distances$distcentroid<-bd.turnover.jac.distances$`bd.turnover.jac$distances`
-bd.turnover.jac.distances$Mesocosm<-row.names(bd.turnover.jac.distances)
-bd.turnover.jac.distances.2<-merge(bd.turnover.jac.distances, compiled.data, by="Mesocosm")
-head(bd.turnover.jac.distances.2)
-
-plot.jac.turnover.distcentroid.12.hydrogen<- ggplot(bd.turnover.jac.distances.2, aes(x=min.10.pH, y=distcentroid, colour=Food.quality)) + geom_point(size=5,aes(colour=factor(Food.quality), shape=CO2)) + guides(fill=FALSE) + scale_fill_manual(values=cbbPalette.all)+ geom_smooth(aes(col=Food.quality, fill=Food.quality), alpha=0.15,size=1.5, method="lm") +scale_shape_manual(values=c(19,17))
-plot.jac.turnover.distcentroid.12.hydrogen<- plot.jac.turnover.distcentroid.12.hydrogen + theme_bw() +  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("jaccard turnover")  + theme(text = element_text(size=16), axis.text = element_text(size=16))+theme(axis.title.y = element_text(angle=90))#+ylim(0,0.75)
-plot.jac.turnover.distcentroid.12.hydrogen<- plot.jac.turnover.distcentroid.12.hydrogen + theme(legend.text = element_text(colour="black", size = 16))+ theme(legend.title = element_text(colour="black", size=16))+theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.line=element_line(size=0.25), axis.ticks.length=unit(-0.25, "cm") )
-plot.jac.turnover.distcentroid.12.hydrogen<- plot.jac.turnover.distcentroid.12.hydrogen+ theme(legend.position="none")+ scale_colour_discrete(name = "Food.quality")+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))
-plot.jac.turnover.distcentroid.12.hydrogen <-plot.jac.turnover.distcentroid.12.hydrogen +  scale_x_reverse( breaks=c(10^-7.0,10^-7.2,10^-7.4,10^-7.6, 10^-7.8), labels=c(7.0, 7.2, 7.4, 7.6, 7.8))
-plot.jac.turnover.distcentroid.12.hydrogen 
-
-bd.nestedness.jac.distances<- as.data.frame(bd.nestedness.jac$distances)
-head(bd.nestedness.jac.distances)
-bd.nestedness.jac.distances$distcentroid<-bd.nestedness.jac.distances$`bd.nestedness.jac$distances`
-bd.nestedness.jac.distances$Mesocosm<-row.names(bd.nestedness.jac.distances)
-bd.nestedness.jac.distances.2<-merge(bd.nestedness.jac.distances, compiled.data, by="Mesocosm")
-head(bd.nestedness.jac.distances.2)
-
-plot.jac.nestedness.distcentroid.12.hydrogen<- ggplot(bd.nestedness.jac.distances.2, aes(x=min.10.pH, y=distcentroid, colour=Food.quality)) + geom_point(size=5,aes(colour=factor(Food.quality), shape=CO2)) + guides(fill=FALSE) + scale_fill_manual(values=cbbPalette.all)+ geom_smooth(aes(col=Food.quality, fill=Food.quality), alpha=0.15,size=1.5, method="lm") +scale_shape_manual(values=c(19,17))
-plot.jac.nestedness.distcentroid.12.hydrogen<- plot.jac.nestedness.distcentroid.12.hydrogen + theme_bw() +  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Jaccard Nestedness")  + theme(text = element_text(size=16), axis.text = element_text(size=16))+theme(axis.title.y = element_text(angle=90))#+ylim(0,0.75)
-plot.jac.nestedness.distcentroid.12.hydrogen<- plot.jac.nestedness.distcentroid.12.hydrogen + theme(legend.text = element_text(colour="black", size = 16))+ theme(legend.title = element_text(colour="black", size=16))+theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.line=element_line(size=0.25), axis.ticks.length=unit(-0.25, "cm") )
-plot.jac.nestedness.distcentroid.12.hydrogen<- plot.jac.nestedness.distcentroid.12.hydrogen+ theme(legend.position="none")+ scale_colour_discrete(name = "Food.quality")+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))
-plot.jac.nestedness.distcentroid.12.hydrogen <-plot.jac.nestedness.distcentroid.12.hydrogen +  scale_x_reverse( breaks=c(10^-7.0,10^-7.2,10^-7.4,10^-7.6, 10^-7.8), labels=c(7.0, 7.2, 7.4, 7.6, 7.8))
-plot.jac.nestedness.distcentroid.12.hydrogen 
-
-
-bd.overall.jac.distances<- as.data.frame(bd.jac$distances)
-head(bd.overall.jac.distances)
-bd.overall.jac.distances$distcentroid<-bd.overall.jac.distances$`bd.jac$distances`
-bd.overall.jac.distances$Mesocosm<-row.names(bd.overall.jac.distances)
-bd.overall.jac.distances.2<-merge(bd.overall.jac.distances, compiled.data, by="Mesocosm")
-head(bd.overall.jac.distances.2)
-
-plot.jac.overall.distcentroid.12.hydrogen<- ggplot(bd.overall.jac.distances.2, aes(x=min.10.pH, y=distcentroid, colour=Food.quality)) + geom_point(size=5,aes(colour=factor(Food.quality), shape=CO2)) + guides(fill=FALSE) + scale_fill_manual(values=cbbPalette.all)+ geom_smooth(aes(col=Food.quality, fill=Food.quality), alpha=0.15,size=1.5, method="lm") +scale_shape_manual(values=c(19,17))
-plot.jac.overall.distcentroid.12.hydrogen<- plot.jac.overall.distcentroid.12.hydrogen + theme_bw() +  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Jaccard distcentroid")  + theme(text = element_text(size=16), axis.text = element_text(size=16))+theme(axis.title.y = element_text(angle=90))#+ylim(0,0.75)
-plot.jac.overall.distcentroid.12.hydrogen<- plot.jac.overall.distcentroid.12.hydrogen + theme(legend.text = element_text(colour="black", size = 16))+ theme(legend.title = element_text(colour="black", size=16))+theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.line=element_line(size=0.25), axis.ticks.length=unit(-0.25, "cm") )
-plot.jac.overall.distcentroid.12.hydrogen<- plot.jac.overall.distcentroid.12.hydrogen+ theme(legend.position="none")+ scale_colour_discrete(name = "Food.quality")+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))
-plot.jac.overall.distcentroid.12.hydrogen <-plot.jac.overall.distcentroid.12.hydrogen +  scale_x_reverse( breaks=c(10^-7.0,10^-7.2,10^-7.4,10^-7.6, 10^-7.8), labels=c(7.0, 7.2, 7.4, 7.6, 7.8))
-plot.jac.overall.distcentroid.12.hydrogen 
-
-
-### Overall bd result ... 
-
-
-
-#the overall bd result is more due to turnover than nestedness....#Baselga paper - species replacement not loss 
-#elevated CO2 has more turnover. 
-
-
-
-
 
 
 # Bray-Curtis -------------------------------------------------------------
-
-
 
 #Standardizing by total of the species ... makes each one on their own scale... 
 head(standardized.species.rec_cover)
@@ -420,7 +211,6 @@ model.meso.bray.sf<-ordisurf(model.meso.bray ~ min.10.pH, data=compiled.data_zsc
 summary(model.meso.bray.sf)
 
 adonis(standardized.species.rec_cover ~ min.10.pH*Food.quality, method="bray", permutations = 9999, data=compiled.data_zscores)
-
 summary(model.meso.bray)
 
 model.meso.bray.scores<- as.data.frame(scores(model.meso.bray)$sites)
@@ -436,12 +226,11 @@ plot.CAP1.12.hydrogen<- plot.CAP1.12.hydrogen+ theme(legend.position="none")+ sc
 plot.CAP1.12.hydrogen 
 
 
+write.csv(model.meso.bray.scores,"C:Data//Mesocosm inventory data//model.meso.bray.scores.csv")
+
+
+
 head(standardized.species.rec_cover)
-
-
-
-str(compiled.data)
-str(compiled.data_zscores)
 
 ### betadispersion 
 dist_bray <- vegdist(standardized.species.rec_cover, method = "bray")
@@ -528,6 +317,10 @@ plot.overall.distcentroid.12.hydrogen<- plot.overall.distcentroid.12.hydrogen + 
 plot.overall.distcentroid.12.hydrogen<- plot.overall.distcentroid.12.hydrogen + theme(legend.text = element_text(colour="black", size = 16))+ theme(legend.title = element_text(colour="black", size=16))+theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.line=element_line(size=0.25), axis.ticks.length=unit(-0.25, "cm") )
 plot.overall.distcentroid.12.hydrogen<- plot.overall.distcentroid.12.hydrogen+ theme(legend.position="none")+ scale_colour_discrete(name = "Food.quality")+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))
 plot.overall.distcentroid.12.hydrogen 
+
+
+
+write.csv(bd.overall.bray.distances.2,"C:Data//Mesocosm inventory data/bd.overall.bray.distances.2.csv")
 
 
 # mvabund -----------------------------------------------------------------
