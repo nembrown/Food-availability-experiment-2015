@@ -2927,7 +2927,7 @@ ptable.community.t %>%
   group_rows("Occupied space, beta (z)", 7,9) %>% 
   group_rows("Total dry biomass, normal", 10,12) %>% 
   group_rows("Partial dbRDA (1st axis), normal",13,15) %>% 
-  group_rows("Homogeneity of dispersions, normal", 16,18) %>% 
+  group_rows("Heterogeneity of dispersions, normal", 16,18) %>% 
   group_rows("Botryllus to Obelia dominance ratio by space, beta (z)", 19,21) %>% 
   group_rows("Botryllus to Obelia dominance ratio by biomass, beta (z)", 22,24) %>% 
   group_rows("Total wet biomass, normal (log)", 25,27) %>% 
@@ -2972,7 +2972,7 @@ stable.community.f %>%
   group_rows("Occupied space, beta (Chi-square)", 7,9) %>% 
   group_rows("Total dry biomass, normal", 10,12) %>% 
   group_rows("Partial dbRDA (1st axis), normal",13,15) %>% 
-  group_rows("Homogeneity of dispersions, normal", 16,18) %>% 
+  group_rows("Heterogeneity of dispersions, normal", 16,18) %>% 
   group_rows("Botryllus to Obelia dominance ratio by space, beta (Chi-square)", 19,21) %>% 
   group_rows("Botryllus to Obelia dominance ratio by biomass, beta (Chi-square)", 22,24) %>% 
   group_rows("Total wet biomass, normal (log)", 25,27) %>% 
@@ -2996,7 +2996,7 @@ pstable.community %>%
   group_rows("Occupied space, beta (Chi-square, z)", 7,9) %>% 
   group_rows("Total dry biomass, normal", 10,12) %>% 
   group_rows("Partial dbRDA (1st axis), normal",13,15) %>% 
-  group_rows("Homogeneity of dispersions, normal", 16,18) %>% 
+  group_rows("Heterogeneity of dispersions, normal", 16,18) %>% 
   group_rows("Botryllus to Obelia dominance ratio by space, beta (Chi-square, z)", 19,21) %>% 
   group_rows("Botryllus to Obelia dominance ratio by biomass, beta (Chi-square, z)", 22,24) %>% 
   group_rows("Total wet biomass, normal (log)", 25,27) %>% 

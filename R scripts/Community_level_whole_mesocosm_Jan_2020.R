@@ -72,8 +72,6 @@ just.species.rec_cover<- species.rec_cover[,-1]
 head(just.species.rec_cover)
 
 
-# New dataframes for other analyses ---------------------------------------
-
 
 ##### making a newdataframe for % cover only - to be used for evenness and shannon diversity
 head(food.exp.data.tile.all)
