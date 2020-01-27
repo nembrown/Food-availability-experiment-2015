@@ -39,9 +39,9 @@ devtools::install_github("haozhu233/kableExtra")
 
 # dataframe management ----------------------------------------------------
 
-food.exp.data.12.2019<-read.csv("C:Data//Mesocosm inventory data//food.exp.data.mesocosm.12.csv")
-food.exp.data.tile.all<-read.csv("C:Data//Mesocosm inventory data//food.exp.data.tile.all.csv")
-food.caprellid.data<-read.csv("C:Data//Emily caprellid data.csv", stringsAsFactors = FALSE, na.strings = c("NA","") )
+food.exp.data.12.2019<-read.csv("C:Data//Data//Mesocosm inventory data//food.exp.data.mesocosm.12.csv")
+food.exp.data.tile.all<-read.csv("C:Data//Data//Mesocosm inventory data//food.exp.data.tile.all.csv")
+food.caprellid.data<-read.csv("C:Data//Data//Emily caprellid data.csv", stringsAsFactors = FALSE, na.strings = c("NA","") )
 
 
 #ordered and unordered factors
@@ -126,232 +126,6 @@ options(contrasts = c("contr.treatment", "contr.poly"))
 
 
 
-# #visualizing data -------------------------------------------------------
-
-cbbPalette.all<- c( "#F8766D", "#00BA38", "#619CFF", "#F8766D", "#00BA38", "#619CFF")
-
-plot.hydroid.12.hydrogen<- ggplot(food.exp.data.tile.all, aes(x=av.pH, y=(hydroid/total), colour=Food.quality)) + geom_point(size=5,aes(colour=factor(Food.quality), shape=CO2)) + guides(fill=FALSE) + scale_fill_manual(values=cbbPalette.all)+ geom_smooth(aes(col=Food.quality, fill=Food.quality, weight=total), alpha=0.15,size=1.5, method="glm", method.args = list(family = "binomial")) +scale_shape_manual(values=c(19,17))
-plot.hydroid.12.hydrogen<- plot.hydroid.12.hydrogen + theme_bw() +  xlab(expression("Average pH")) + ylab(expression(atop(italic("Obelia")~"abundance","(proportion cover)"))) + theme(text = element_text(size=16), axis.text = element_text(size=16))+theme(axis.title.y = element_text(angle=90))
-plot.hydroid.12.hydrogen<- plot.hydroid.12.hydrogen + theme(legend.text = element_text(colour="black", size = 16))+ theme(legend.title = element_text(colour="black", size=16))+theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.y = element_blank(), panel.grid.minor.y = element_blank(), axis.line=element_line(size=0.25), axis.ticks.length=unit(-0.25, "cm") )
-plot.hydroid.12.hydrogen<- plot.hydroid.12.hydrogen+ theme(legend.position="none")+ scale_colour_discrete(name = "Food.quality")+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))+ theme(axis.text.x = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")), axis.text.y = element_text(margin=margin(0.5, 0.5, 0.5, 0.5, "cm")))
-plot.hydroid.12.hydrogen
-
-#Binomial: (doesn't work for hydroid) 
-fitBinom=fitdist(data=food.exp.data.12.2019$hydroid, dist="binom", fix.arg=list(size=100), start=list(prob=0.01))
-qqp(food.exp.data.12.2019$hydroid, "binom", size = 100, prob = fitBinom$estimate[[1]])
-
-#log-normal
-qqp(food.exp.data.12.2019$hydroid, "lnorm")
-#not great at lower end
-
-#normal
-qqp(food.exp.data.12.2019$hydroid, "norm")
-#not great at lower end
-
-#Beta distribution
-beta.12<-fitdist(0.01*(food.exp.data.12.2019$hydroid+0.01), "beta", start=NULL)
-qqp(0.01*(food.exp.data.12.2019$hydroid+0.01), "beta", shape1 = beta.12$estimate[[1]], shape2 = beta.12$estimate[[2]])
-#not great at the upper end
-
-#beta-binomial? 
-
-
-
-# Model building ----------------------------------------------------------
-
-
-#Binomial
-glm.binomial.hydroid.12.hydrogen<- glm(formula = cbind(hydroid, 100-hydroid)~ av.pH*Food.quality, data = food.exp.data.12.2019_zscores, family = binomial(link="logit"))
-summary(glm.binomial.hydroid.12.hydrogen)
-
-
-m1<-glm.binomial.hydroid.12.hydrogen
-op<-par(mfrow=c(2,2))
-plot(m1)
-#7 or 8 points with high leverage
-
-#improved qq plot
-qq.gam(m1,pch=16)
-#doesn't look good
-
-#check for overdsispersion
-overdisp_fun <- function(model) {
-  rdf <- df.residual(model)
-  rp <- residuals(model,type="pearson")
-  Pearson.chisq <- sum(rp^2)
-  prat <- Pearson.chisq/rdf
-  pval <- pchisq(Pearson.chisq, df=rdf, lower.tail=FALSE)
-  c(chisq=Pearson.chisq,ratio=prat,rdf=rdf,p=pval)
-}
-overdisp_fun(m1)
-#definitely overdispersed
-#the variance is greater than the mean 
-
-
-#okay so move on from binomial
-
-#options are 1. alternative distributions: quasi binomial, beta-binomial
-#Keep in mind that once you switch to quasi-likelihood you will either have to eschew inferential methods 
-#such as the likelihood ratio test, profile confidence intervals, AIC, etc., or make more heroic assumptions 
-#to compute "quasi-" analogs of all of the above (such as QAIC).
-#not too many options for beta-binomial... 
-
-#2. observation-level random effects
-#3. GAM
-
-
-# #quasibinomial: ---------------------------------------------------------
-
-
-quasi.hydroid.1<- glm(formula = cbind(hydroid, 100-hydroid)~ av.pH*Food.quality, data = food.exp.data.12.2019_zscores, family = quasibinomial)
-summary(quasi.hydroid.1)
-
-
-quasi.hydroid.2<- glm(formula = cbind(hydroid, 100-hydroid)~ av.pH+Food.quality, data = food.exp.data.12.2019_zscores, family = quasibinomial)
-summary(quasi.hydroid.2)
-
-anova(quasi.hydroid.1, quasi.hydroid.2, test="F")
-
-#But the assumptions are off here according to Bolker? 
-
-
-# GLMM: Observation-level random effect added -----------------------------
-
-theme_set(theme_bw()+theme(panel.spacing=grid::unit(0,"lines")))
-
-#let's try observation-level random effects
-#glmmadmb is no longer the best one - Bolker suggests glmmTMB, using Template Model Builder
-
-?glmmTMB
-
-
-glmm.av.binomial.hydroid.12<- glmmTMB(formula = cbind(hydroid, 100-hydroid)~ av.pH*Food.quality+(1|Mesocosm), data = food.exp.data.12.2019_zscores, family = binomial)
-summary(glmm.av.binomial.hydroid.12)
-
-glmm.av.betabinomial.hydroid.12<- glmmTMB(formula = cbind(hydroid, 100-hydroid)~ av.pH*Food.quality+(1|Mesocosm), data = food.exp.data.12.2019_zscores, family = betabinomial)
-summary(glmm.av.betabinomial.hydroid.12)
-
-glmm.av.betabinomial.nr.hydroid.12<- glmmTMB(formula = cbind(hydroid, 100-hydroid)~ av.pH*Food.quality, data = food.exp.data.12.2019_zscores, family = betabinomial)
-summary(glmm.av.betabinomial.nr.hydroid.12)
-
-glmm.av.betabinomial.reml.hydroid.12<- glmmTMB(formula = cbind(hydroid, 100-hydroid)~ av.pH*Food.quality, data = food.exp.data.12.2019_zscores, family = betabinomial, REML=TRUE)
-summary(glmm.av.betabinomial.reml.hydroid.12)
-
-AICtab(glmm.av.binomial.hydroid.12, glmm.av.betabinomial.hydroid.12, glmm.av.betabinomial.nr.hydroid.12, glmm.av.betabinomial.reml.hydroid.12)
-#betabinomial best 
-
-
-#glmmTMB has the capability to simulate from a fitted model. These simulations resample random effects from their estimated distribution.
-simo=simulate(glmm.av.betabinomial.hydroid.12, seed=1)
-Simdat=food.exp.data.12.2019_zscores
-Simdat$hydroid=simo[[1]]
-
-Simdat=transform(Simdat,
-                 type="simulated")
-food.exp.data.12.2019_zscores$type = "observed"  
-Dat=rbind(food.exp.data.12.2019_zscores, Simdat) 
-
-#Then we can plot the simulated data against the observed data to check if they are similar.
-
-ggplot(Dat,  aes(hydroid, colour=type))+geom_density()+facet_grid(food.exp.data.12.2019_zscores$Food.quality)
-
-#For low food not very similar
-
-#glmm.av.betabinomial.nr.hydroid.12 -> not great, but glmm.av.betabinomial.hydroid.12 a bit better? 
-
-#before evaulating inference - need to check diagnostics - search for glmmtmb diagnostics? 
-
-#ggplot(data = NULL) + geom_point(aes(y = residuals(glmm.av.betabinomial.nr.hydroid.12,type = "pearson", scaled = TRUE), x = fitted(glmm.av.betabinomial.nr.hydroid.12)))
-#cant' yet do fitted objects from betabinomial
-
-#dharma
-
-simulationOutput <- simulateResiduals(fittedModel = glmm.av.betabinomial.hydroid.12)
-plotSimulatedResiduals(simulationOutput = simulationOutput)
-#nr. not a perfect fit though - lines should fit  but one is curved and the other two are flat. QQ plot residuals are pretty good... 
-#next one down is not great either but a bit better? 
-
-testZeroInflation(simulationOutput)
-plotSimulatedResiduals(simulationOutput = simulationOutput, quantreg = T)
-#so our model is not great still.... 
-
-
-
-augDat <- data.frame(food.exp.data.12.2019_zscores,resid=residuals(glmm.av.betabinomial.nr.hydroid.12,type="pearson"),
-                     fitted=fitted(glmm.av.betabinomial.nr.hydroid.12))
-ggplot(augDat,aes(x=Food.quality,y=resid))+geom_boxplot()+coord_flip()
-#doesn't work for glmmTMB
-
-
-
-# GAM ---------------------------------------------------------------------
-#Gavin Simpson's gratia
-library(devtools)
-devtools::install_github('gavinsimpson/gratia')
-library(gratia)
-
-set.seed(20)
-dat <- gamSim(1, n = 400, dist = "normal", scale = 2, verbose = FALSE)
-
-head(dat)
-
-mod <- gam(y ~ s(x0) + s(x1) + s(x2) + s(x3), data = dat, method = "REML")
-summary(mod)
-
-k.check(mod)
-#function for checking whether sufficient numbers of basis functions were used in each smooth in the model.
-#k-index reported. The further below 1 this is, the more likely it is that there is missed pattern left in the residuals.
-
-
-draw(mod)
-#In gratia, we use the draw() generic to produce ggplot2-like plots from objects. 
-#To visualize the four estimated smooth functions in the GAM mod, we would use draw(mod)
-
-
-evaluate_smooth(mod, "x1")
-# if you wanted to extract most of the data used to build the plot 
-
-
-appraise(mod)
-#diagnostics
-
-qq_plot(mod, method = 'simulate')
-#the data simulation procedure (method = 'simulate') to generate reference quantiles, 
-#which typically have better performance for GLM-like models (Augustin et al., 2012).
-
-#We have a varying coefficient model aka ANCOVA, so use "by"
-
-#Let smoothness selection do all the work by adding a penalty on the null space of each smooth. gam(...,select=TRUE) does this.
-
-#This approach leaves the original smoothing penalty unchanged, but constructs an additional penalty for each smooth, 
-#which penalizes only functions in the null space of the original penalty (the 'completely smooth' functions). 
-#Hence, if all the smoothing parameters for a term tend to infinity, the term will be selected out of the model. 
-#This latter approach is more expensive computationally, but has the advantage that it can be applied automatically to any smooth term. 
-#The select argument to gam turns on this method.
-
-#In fact, as implemented, both approaches operate by eigen-decomposiong the original penalty matrix. 
-#A new penalty is created on the null space: it is the matrix with the same eigenvectors as the original penalty, 
-#but with the originally postive egienvalues set to zero, and the originally zero eigenvalues set to something positive. 
-#The first approach just addes a multiple of this penalty to the original penalty, where the multiple is chosen so that the new penalty 
-#can not dominate the original. The second approach treats the new penalty as an extra penalty, with its own smoothing parameter.
-
-#Of course, as with all model selection methods, some care must be take to ensure that the automatic selection is sensible, 
-#and a decision about the effective degrees of freedom at which to declare a term 'negligible' has to be made
-
-
-## I do in fact have ordered factor - meaning "none" is the base level and the other two relate to that....
-#https://www.fromthebottomoftheheap.net/2017/12/14/difference-splines-ii/
-#The first s(x) in the model is the smooth effect of x on the reference level of the ordered factor of. 
-#The second smoother, s(x, by = of) is the set of L???1 difference smooths, which model the smooth differences 
-#between the reference level smoother and those of the individual levels (excluding the reference one)
-#the intercept is then an estimate of the mean response for the reference level of the factor, and the remaining 
-#model coefficients estimate the differences between the mean response of the reference level and that of the other factor levels.
-
-#"oFood.quality" is ordered "Food.quality" is unordered
-
-#select=TRUE is automatic model selection via null space penalization
-
-
 
 # GAM beta hydroid / gam.av.beta.hydroid.12.3 --------------------------------------------------------
 
@@ -434,7 +208,7 @@ plt.av.gam.av.hydroid <- ggplot(ndata.av.hydroid, aes(x = av.pH.unscaled, y = fi
   geom_ribbon(data = ndata.av.hydroid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.gam.av.hydroid 
-ggsave("C:Graphs July 2019//Average//hydroid_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//hydroid_pred_av.png")
 
 
 
@@ -511,7 +285,7 @@ plt.av.alive.bot <- ggplot(ndata.av.alive.bot, aes(x = av.pH.unscaled, y = fit))
   geom_ribbon(data = ndata.av.alive.bot,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.alive.bot
-ggsave("C:Graphs July 2019//Average//alive.bot_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//alive.bot_pred_av.png")
 
 
 
@@ -601,7 +375,7 @@ plt.av.caprellid <- ggplot(ndata.av.caprellid, aes(x = av.pH.unscaled, y = fit))
   geom_ribbon(data = ndata.av.caprellid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.caprellid
-ggsave("C:Graphs July 2019//Average//caprellid_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//caprellid_pred_av.png")
 
 
 
@@ -676,7 +450,7 @@ plt.caprellid.av.percent <- ggplot(ndata.caprellid.av.percent, aes(x = av.pH.uns
   geom_ribbon(data = ndata.caprellid.av.percent,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.caprellid.av.percent
-ggsave("C:Graphs July 2019//Average//caprellid.av.percent_pred.png")
+ggsave("C:Data//Graphs July 2019//Average//caprellid.av.percent_pred.png")
 
 
 # GAM beta formicula / gam.av.beta.formicula.12 -----------------------------------------------------------
@@ -764,7 +538,7 @@ plt.av.formicula <- ggplot(ndata.av.formicula, aes(x = av.pH.unscaled, y = fit))
   geom_ribbon(data = ndata.av.formicula,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.formicula
-ggsave("C:Graphs July 2019//Average//formicula_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//formicula_pred_av.png")
 
 
 
@@ -847,7 +621,7 @@ plt.av.alive.mem <- ggplot(ndata.av.alive.mem, aes(x = av.pH.unscaled, y = fit))
   geom_ribbon(data = ndata.av.alive.mem,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.alive.mem
-ggsave("C:Graphs July 2019//Average//alive.mem_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//alive.mem_pred_av.png")
 
 
 # GAM beta didemnum / gam.av.beta.didemnum.12 ------------------------------------------------------------
@@ -930,7 +704,7 @@ plt.av.didemnum <- ggplot(ndata.av.didemnum, aes(x = av.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.av.didemnum,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.didemnum
-ggsave("C:Graphs July 2019//Average//didemnum_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//didemnum_pred_av.png")
 
 
 
@@ -1027,7 +801,7 @@ plt.av.mussel_complete <- ggplot(ndata.av.mussel_complete, aes(x = av.pH.unscale
   geom_ribbon(data = ndata.av.mussel_complete,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.mussel_complete
-ggsave("C:Graphs July 2019//Average//mussel_complete_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//mussel_complete_pred_av.png")
 
 
 # GAM negbin barnacles / gam.av.nb.num.barn.alive.12 -----------------------------------------------------------
@@ -1111,7 +885,7 @@ plt.av.num.barn.alive <- ggplot(ndata.av.num.barn.alive, aes(x = av.pH.unscaled,
   geom_ribbon(data = ndata.av.num.barn.alive,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.num.barn.alive
-ggsave("C:Graphs July 2019//Average//num.barn.alive_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//num.barn.alive_pred_av.png")
 
 
 
@@ -1201,7 +975,7 @@ plt.av.disporella <- ggplot(ndata.av.disporella, aes(x = av.pH.unscaled, y = fit
   geom_ribbon(data = ndata.av.disporella,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.disporella
-ggsave("C:Graphs July 2019//Average//disporella_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//disporella_pred_av.png")
 
 
 # GAM negbin schizo / gam.av.nb.schizo.12 --------------------------------------------------------------
@@ -1292,7 +1066,7 @@ plt.av.schizo <- ggplot(ndata.av.schizo, aes(x = av.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.av.schizo,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.schizo
-ggsave("C:Graphs July 2019//Average//schizo_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//schizo_pred_av.png")
 
 
 
@@ -1388,7 +1162,7 @@ plt.av.num.nudi <- ggplot(ndata.av.num.nudi, aes(x = av.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.av.num.nudi,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.num.nudi
-ggsave("C:Graphs July 2019//Average//num.nudi_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//num.nudi_pred_av.png")
 
 
 # GAM nb() serpulids / gam.av.nb.num.serpulid.12.1 -----------------------------------------------------------
@@ -1478,7 +1252,7 @@ plt.av.num.serpulid <- ggplot(ndata.av.num.serpulid, aes(x = av.pH.unscaled, y =
   geom_ribbon(data = ndata.av.num.serpulid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.num.serpulid
-ggsave("C:Graphs July 2019//Average//num.serpulid_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//num.serpulid_pred_av.png")
 
 
 # GAM negbin orange sponge / gam.av.nb.orange_sponge.12.1 -------------------------------------------------------
@@ -1566,7 +1340,7 @@ plt.av.orange_sponge <- ggplot(ndata.av.orange_sponge, aes(x = av.pH.unscaled, y
   geom_ribbon(data = ndata.av.orange_sponge,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.orange_sponge
-ggsave("C:Graphs July 2019//Average//orange_sponge_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//orange_sponge_pred_av.png")
 
 
 
@@ -1660,7 +1434,7 @@ plt.av.num.corella <- ggplot(ndata.av.num.corella, aes(x = av.pH.unscaled, y = f
   geom_ribbon(data = ndata.av.num.corella,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.num.corella
-ggsave("C:Graphs July 2019//Average//num.corella_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//num.corella_pred_av.png")
 
 
 
@@ -1741,13 +1515,28 @@ plt.av.clam <- ggplot(ndata.av.clam, aes(x = av.pH.unscaled, y = fit)) +
   geom_line(size=1.5, aes(colour=oFood.quality)) +
   geom_point(aes(y = clam, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
   xlab(expression("Average pH")) + ylab("Clam abundance\n(# of individuals)")+  
-  scale_color_manual(values=colorset2)+
+  scale_color_manual(values=colorset2+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.av.clam,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.clam
-ggsave("C:Graphs July 2019//Average//clam_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//clam_pred_av.png")
+
+###legend
+plt.legend <- ggplot(ndata.clam, aes(x = min.10.pH.unscaled, y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes(colour=oFood.quality)) +
+  geom_point(aes(y = clam, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Clam abundance\n(# of individuals)")+  
+  scale_color_manual(values=colorset2, name = "Food supplementation", labels = c("None", "Low-quality", "High-quality"))+
+  scale_fill_manual(values=colorset2)+
+  scale_shape_manual(values=c(19,17), name = "pH", labels = c("Ambient", "Low pH"))+
+  guides(color = guide_legend(order = 2), shape = guide_legend(order = 1), fill = FALSE)+
+  geom_ribbon(data = ndata.clam,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)
+plt.legend 
+
+legend_food <- get_legend(plt.legend + theme(legend.position="bottom"))
 
 
 
@@ -1763,7 +1552,7 @@ fig.2.av<-plot_grid(plt.av.gam.av.hydroid,plt.av.alive.bot,plt.av.formicula,plt.
                           '(h)', '(i)', '(j)','(k)','(l)','(m)','(n)','(o)', ''))
 fig.2.av
 
-ggsave("C:For submission//Fig2.av.png", width=65, height=35, units="cm")
+ggsave("C:Data//For submission//For resubmission//Fig2.av.png", width=65, height=35, units="cm")
 
 
 
@@ -1903,7 +1692,7 @@ ptable.av %>%
   group_rows("Sponge", 37, 39) %>% 
   group_rows("Corella", 40, 42) %>% 
   group_rows("Clams", 43, 45)%>% 
-  save_kable(file = "C:For submission//ptable.av.html", self_contained = T)
+  save_kable(file = "C:Data//For submission//For resubmission//ptable.av.html", self_contained = T)
 
 
 ### s table
@@ -1949,7 +1738,7 @@ stable.av %>%
   group_rows("Sponge", 37, 39) %>% 
   group_rows("Corella", 40, 42) %>% 
   group_rows("Clams", 43, 45) %>% 
-  save_kable(file = "C:For submission//stable.av.html", self_contained = T)
+  save_kable(file = "C:Data//For submission//For resubmission//stable.av.html", self_contained = T)
 
 
 pstable.av<-cbind(ptable.av, stable.av)
@@ -1978,7 +1767,7 @@ pstable.av %>%
   group_rows("Sponge, negative binomial", 37, 39) %>% 
   group_rows("Corella, negative binomial", 40, 42) %>% 
   group_rows("Clams, poisson", 43, 45) %>% 
-  save_kable(file = "C:For submission//pstable.av.html", self_contained = T)
+  save_kable(file = "C:Data//For submission//For resubmission//pstable.av.html", self_contained = T)
 
 
 
@@ -1991,23 +1780,6 @@ pstable.av %>%
 
 
 # Richness ----------------------------------------------------------------
-
-
-poisson.12<-fitdistr(food.exp.data.12.2019_zscores$richness, "Poisson")
-qqp(food.exp.data.12.2019_zscores$richness, "pois", lambda=poisson.12$estimate[[1]])
-
-
-nbinom12.richness<- fitdistr(food.exp.data.12.2019_zscores$richness, "Negative Binomial")
-qqp(food.exp.data.12.2019_zscores$richness, "nbinom", size = nbinom12.richness$estimate[[1]], mu = nbinom12.richness$estimate[[2]])
-#worse than poiisson
-
-
-glm.av.nb.richness.12.hydrogen<- glm.nb(richness~ av.pH*oFood.quality, data = food.exp.data.12.2019_zscores)
-plot(glm.av.binomial.richness.12.hydrogen)
-
-glm.av.poisson.richness.12.hydrogen<- glm(richness~ av.pH*oFood.quality, data = food.exp.data.12.2019_zscores, family="poisson")
-overdisp_fun(glm.av.poisson.richness.12.hydrogen)
-#not overdispersed
 
 #negative binomial 
 gam.av.nb.richness.12<- gam(richness ~ s(av.pH)+ oFood.quality + s(av.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = negbin(nbinom12.richness$estimate[[1]]), select=TRUE, method="REML")
@@ -2073,7 +1845,7 @@ plt.av.richness <- ggplot(ndata.av.richness, aes(x = av.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.av.richness,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.richness
-ggsave("C:Graphs July 2019//Average//richness_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//richness_pred_av.png")
 
 
 
@@ -2153,7 +1925,7 @@ plt.av.evenness <- ggplot(ndata.av.evenness, aes(x = av.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.av.evenness,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.evenness
-ggsave("C:Graphs July 2019//Average//evenness_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//evenness_pred_av.png")
 
 
 
@@ -2250,7 +2022,7 @@ plt.av.occupied.space <- ggplot(ndata.av.occupied.space, aes(x = av.pH.unscaled,
   geom_ribbon(data = ndata.av.occupied.space,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.occupied.space
-ggsave("C:Graphs July 2019//Average//occupied.space_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//occupied.space_pred_av.png")
 
 
 
@@ -2342,7 +2114,7 @@ plt.av.everything.wet.weight <- ggplot(ndata.av.everything.wet.weight, aes(x = a
   geom_ribbon(data = ndata.av.everything.wet.weight,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.everything.wet.weight
-ggsave("C:Graphs July 2019//Average//everything.wet.weight_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//everything.wet.weight_pred_av.png")
 
 
 
@@ -2436,7 +2208,7 @@ plt.av.everything.wet.weight.per.1 <- ggplot(ndata.av.everything.wet.weight.per.
   geom_ribbon(data = ndata.av.everything.wet.weight.per.1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.everything.wet.weight.per.1
-ggsave("C:Graphs July 2019//Average//everything.wet.weight.per.1_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//everything.wet.weight.per.1_pred_av.png")
 
 
 
@@ -2529,7 +2301,7 @@ plt.av.total_dry_biomass <- ggplot(ndata.av.total_dry_biomass, aes(x = av.pH.uns
   geom_ribbon(data = ndata.av.total_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.total_dry_biomass
-ggplot2::ggsave("C:Graphs July 2019//Average//total_dry_biomass_pred_av.png")
+ggplot2::ggsave("C:Data//Graphs July 2019//Average//total_dry_biomass_pred_av.png")
 
 # hydroid biomass ---------------------------------------------------------
 
@@ -2619,7 +2391,7 @@ plt.av.hydroid_dry_biomass <- ggplot(ndata.av.hydroid_dry_biomass, aes(x = av.pH
   geom_ribbon(data = ndata.av.hydroid_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")+ylim(0,.75)
 plt.av.hydroid_dry_biomass
-ggplot2::ggsave("C:Graphs July 2019//Average//hydroid_dry_biomass_pred_av.png")
+ggplot2::ggsave("C:Data//Graphs July 2019//Average//hydroid_dry_biomass_pred_av.png")
 
 
 
@@ -2713,7 +2485,7 @@ plt.av.tunicate_dry_biomass <- ggplot(ndata.av.tunicate_dry_biomass, aes(x = av.
   geom_ribbon(data = ndata.av.tunicate_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.tunicate_dry_biomass
-ggplot2::ggsave("C:Graphs July 2019//Average//tunicate_dry_biomass_pred_av.png")
+ggplot2::ggsave("C:Data//Graphs July 2019//Average//tunicate_dry_biomass_pred_av.png")
 
 
 
@@ -2805,7 +2577,7 @@ plt.av.caprellid_dry_biomass <- ggplot(ndata.av.caprellid_dry_biomass, aes(x = a
   geom_ribbon(data = ndata.av.caprellid_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.caprellid_dry_biomass
-ggplot2::ggsave("C:Graphs July 2019//Average//caprellid_dry_biomass_pred_av.png")
+ggplot2::ggsave("C:Data//Graphs July 2019//Average//caprellid_dry_biomass_pred_av.png")
 
 
 
@@ -2898,7 +2670,7 @@ plt.av.rest_dry_biomass <- ggplot(ndata.av.rest_dry_biomass, aes(x = av.pH.unsca
   geom_ribbon(data = ndata.av.rest_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.rest_dry_biomass
-ggplot2::ggsave("C:Graphs July 2019//Average//rest_dry_biomass_pred_av.png")
+ggplot2::ggsave("C:Data//Graphs July 2019//Average//rest_dry_biomass_pred_av.png")
 
 
 
@@ -2994,7 +2766,7 @@ plt.av.Mussel.wet.weight <- ggplot(ndata.av.Mussel.wet.weight, aes(x = av.pH.uns
   geom_ribbon(data = ndata.av.Mussel.wet.weight,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.Mussel.wet.weight
-ggsave("C:Graphs July 2019//Average//Mussel.wet.weight_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//Mussel.wet.weight_pred_av.png")
 
 
 
@@ -3095,7 +2867,7 @@ plt.av.Mussel.wet.weight.per.1 <- ggplot(ndata.av.Mussel.wet.weight.per.1, aes(x
   geom_ribbon(data = ndata.av.Mussel.wet.weight.per.1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.Mussel.wet.weight.per.1
-ggsave("C:Graphs July 2019//Average//Mussel.wet.weight.per.1_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//Mussel.wet.weight.per.1_pred_av.png")
 
 
 
@@ -3193,7 +2965,7 @@ plt.av.gam.av.hydtobot <- ggplot(ndata.av.hydtobot, aes(x = av.pH.unscaled, y = 
   geom_ribbon(data = ndata.av.hydtobot,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")+ geom_hline(yintercept=0.5, linetype="dashed", color="black", size=1)+coord_cartesian(ylim = c(0, 1)) 
 plt.av.gam.av.hydtobot 
-ggsave("C:For submission//hydtobot_pred_av.png")
+ggsave("C:Data//For submission//For resubmission//hydtobot_pred_av.png")
 
 
 
@@ -3294,7 +3066,7 @@ plt.av.gam.av.hydtobot_dry_biomass <- ggplot(ndata.av.hydtobot_dry_biomass, aes(
   geom_ribbon(data = ndata.av.hydtobot_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")+ geom_hline(yintercept=0.5, linetype="dashed", color="black", size=1)+coord_cartesian(ylim = c(0, 1)) 
 plt.av.gam.av.hydtobot_dry_biomass 
-ggsave("C:For submission//hydtobot_dry_biomass_pred_av.png")
+ggsave("C:Data//For submission//For resubmission//hydtobot_dry_biomass_pred_av.png")
 
 
 
@@ -3374,88 +3146,88 @@ plt.av.CAP1 <- ggplot(ndata.av.CAP1, aes(x = av.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.av.CAP1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.av.CAP1
-ggsave("C:Graphs July 2019//Average//CAP1_pred_av.png")
+ggsave("C:Data//Graphs July 2019//Average//CAP1_pred_av.png")
 
 
 
 
-# Distances ---------------------------------------------------------------
+# distcentroid ---------------------------------------------------------------
 
-qqp(food.exp.data.12.2019_zscores$distances)
+qqp(food.exp.data.12.2019_zscores$distcentroid)
 
 
-qqp(food.exp.data.12.2019_zscores$distances, "lnorm")
+qqp(food.exp.data.12.2019_zscores$distcentroid, "lnorm")
 
 head(food.exp.data.12.2019_zscores)
 
 
-lm.av.distances<-lm(distances ~ av.pH*oFood.quality, data=food.exp.data.12.2019_zscores)
+lm.av.distcentroid<-lm(distcentroid ~ av.pH*oFood.quality, data=food.exp.data.12.2019_zscores)
 
-gam.av.lm.distances.12<- gam(distances ~ s(av.pH)+ oFood.quality + s(av.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
-gam.av.loglink.distances.12.1<- gam(distances ~ s(av.pH)+ oFood.quality + s(av.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = gaussian(link="log"), select=TRUE, method="REML")
-
-
-AICtab(gam.av.loglink.distances.12.1,lm.av.distances,  gam.av.lm.distances.12)
-
-#gam.av.lm.distances
+gam.av.lm.distcentroid.12<- gam(distcentroid ~ s(av.pH)+ oFood.quality + s(av.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
+gam.av.loglink.distcentroid.12.1<- gam(distcentroid ~ s(av.pH)+ oFood.quality + s(av.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = gaussian(link="log"), select=TRUE, method="REML")
 
 
-plot(gam.av.lm.distances.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.av.lm.distances.12)
-qq_plot(gam.av.lm.distances.12, method = 'simulate')
-k.check(gam.av.lm.distances.12)
-summary(gam.av.lm.distances.12)
+AICtab(gam.av.loglink.distcentroid.12.1,lm.av.distcentroid,  gam.av.lm.distcentroid.12)
+
+#gam.av.lm.distcentroid
 
 
+plot(gam.av.lm.distcentroid.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
+appraise(gam.av.lm.distcentroid.12)
+qq_plot(gam.av.lm.distcentroid.12, method = 'simulate')
+k.check(gam.av.lm.distcentroid.12)
+summary(gam.av.lm.distcentroid.12)
 
 
 
-gam.av.lm.distances.12.unordered<- gam(distances ~ s(av.pH)+ Food.quality + s(av.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
-summary(gam.av.lm.distances.12.unordered)
-
-fam.gam.av.distances <- family(gam.av.lm.distances.12)
-fam.gam.av.distances
-str(fam.gam.av.distances)
-ilink.gam.av.distances<- fam.gam.av.distances$linkinv
-ilink.gam.av.distances
 
 
-mod.av.distances<-gam.av.lm.distances.12
-ndata.av.distances <- with(food.exp.data.12.2019_zscores, data_frame(av.pH = seq(min(av.pH), max(av.pH),
+gam.av.lm.distcentroid.12.unordered<- gam(distcentroid ~ s(av.pH)+ Food.quality + s(av.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
+summary(gam.av.lm.distcentroid.12.unordered)
+
+fam.gam.av.distcentroid <- family(gam.av.lm.distcentroid.12)
+fam.gam.av.distcentroid
+str(fam.gam.av.distcentroid)
+ilink.gam.av.distcentroid<- fam.gam.av.distcentroid$linkinv
+ilink.gam.av.distcentroid
+
+
+mod.av.distcentroid<-gam.av.lm.distcentroid.12
+ndata.av.distcentroid <- with(food.exp.data.12.2019_zscores, data_frame(av.pH = seq(min(av.pH), max(av.pH),
                                                                                   length = 100),  oFood.quality = oFood.quality[want],  CO2= CO2[want]))
 
 
 ## add the fitted values by predicting from the model for the new data
-ndata.av.distances <- add_column(ndata.av.distances, fit = predict(mod.av.distances, newdata = ndata.av.distances, type = 'response'))
+ndata.av.distcentroid <- add_column(ndata.av.distcentroid, fit = predict(mod.av.distcentroid, newdata = ndata.av.distcentroid, type = 'response'))
 
-predict(mod.av.distances, newdata = ndata.av.distances, type = 'response')
-ndata.av.distances <- bind_cols(ndata.av.distances, setNames(as_tibble(predict(mod.av.distances, ndata.av.distances, se.fit = TRUE)[1:2]),
+predict(mod.av.distcentroid, newdata = ndata.av.distcentroid, type = 'response')
+ndata.av.distcentroid <- bind_cols(ndata.av.distcentroid, setNames(as_tibble(predict(mod.av.distcentroid, ndata.av.distcentroid, se.fit = TRUE)[1:2]),
                                                        c('fit_link','se_link')))
 
 ## create the interval and backtransform
 
-ndata.av.distances <- mutate(ndata.av.distances,
-                          fit_resp  = ilink.gam.av.distances(fit_link),
-                          right_upr = ilink.gam.av.distances(fit_link + (2 * se_link)),
-                          right_lwr = ilink.gam.av.distances(fit_link - (2 * se_link)))
+ndata.av.distcentroid <- mutate(ndata.av.distcentroid,
+                          fit_resp  = ilink.gam.av.distcentroid(fit_link),
+                          right_upr = ilink.gam.av.distcentroid(fit_link + (2 * se_link)),
+                          right_lwr = ilink.gam.av.distcentroid(fit_link - (2 * se_link)))
 
 
-ndata.av.distances$av.pH.unscaled<-ndata.av.distances$av.pH * attr(food.exp.data.12.2019_zscores$av.pH, 'scaled:scale') + attr(food.exp.data.12.2019_zscores$av.pH, 'scaled:center')
+ndata.av.distcentroid$av.pH.unscaled<-ndata.av.distcentroid$av.pH * attr(food.exp.data.12.2019_zscores$av.pH, 'scaled:scale') + attr(food.exp.data.12.2019_zscores$av.pH, 'scaled:center')
 
 
 # plot 
-plt.av.distances <- ggplot(ndata.av.distances, aes(x = av.pH.unscaled, y = fit)) + 
+plt.av.distcentroid <- ggplot(ndata.av.distcentroid, aes(x = av.pH.unscaled, y = fit)) + 
   theme_classic()+
   geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y =(distances), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Average pH")) + ylab("Homogeneity of multivariate dispersions\n(distance to multivariate centroid)")+  
+  geom_point(aes(y =(distcentroid), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Average pH")) + ylab("Heterogeneity of multivariate dispersions\n(distance to multivariate centroid)")+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
-  geom_ribbon(data = ndata.av.distances,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
+  geom_ribbon(data = ndata.av.distcentroid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
-plt.av.distances
-ggsave("C:Graphs July 2019//Average//distances_pred_av.png")
+plt.av.distcentroid
+ggsave("C:Data//Graphs July 2019//Average//distcentroid_pred_av.png")
 
 
 
@@ -3469,20 +3241,20 @@ library(cowplot)
 
 #fig.av.biomass
 
-#ggplot2::ggsave("C:For submission//Supplemental//Fig.av.biomass.png", width=65, height=10, units="cm")
+#ggplot2::ggsave("C:Data//For submission//For resubmission//Supplemental//Fig.av.biomass.png", width=65, height=10, units="cm")
 
 
 
 fig.3.av.community<-plot_grid( plt.av.occupied.space,plt.av.total_dry_biomass,
                                plt.av.richness, plt.av.evenness,
-                               plt.av.CAP1, plt.av.distances,legend_food, ncol=2, rel_heights = c(1,1,1,.2),
+                               plt.av.CAP1, plt.av.distcentroid,legend_food, ncol=2, rel_heights = c(1,1,1,.2),
                                align='v', axis='l',
                                labels=c('(a)', '(b)','(c)', '(d)', '(e)', '(f)'))
 
 fig.3.av.community
 
 
-ggplot2::ggsave("C:For submission//Fig.3.av.community.png",  width=30, height=40, units="cm")
+ggplot2::ggsave("C:Data//For submission//For resubmission//Fig.3.av.community.png",  width=30, height=40, units="cm")
 
 
 # Community level tables --------------------------------------------------
@@ -3498,8 +3270,8 @@ evenness.gam.av.unordered<-summary(gam.av.lm.evenness.12.unordered)
 occupied.space.gam.av<- summary(gam.av.beta.occupied.space.12)
 occupied.space.gam.av.unordered<- summary(gam.av.beta.occupied.space.12.unordered)
 
-distances.gam.av<- summary(gam.av.lm.distances.12)
-distances.gam.av.unordered<- summary(gam.av.lm.distances.12.unordered)
+distcentroid.gam.av<- summary(gam.av.lm.distcentroid.12)
+distcentroid.gam.av.unordered<- summary(gam.av.lm.distcentroid.12.unordered)
 
 
 CAP1.gam.av <- summary(gam.av.lm.CAP1.12)
@@ -3554,8 +3326,8 @@ evenness.gam.av.s.table<-as.data.frame(evenness.gam.av$s.table)
 occupied.space.gam.av.p.table<-as.data.frame(occupied.space.gam.av.unordered$p.table)
 occupied.space.gam.av.s.table<-as.data.frame(occupied.space.gam.av$s.table)
 
-distances.gam.av.p.table<-as.data.frame(distances.gam.av.unordered$p.table)
-distances.gam.av.s.table<-as.data.frame(distances.gam.av$s.table)
+distcentroid.gam.av.p.table<-as.data.frame(distcentroid.gam.av.unordered$p.table)
+distcentroid.gam.av.s.table<-as.data.frame(distcentroid.gam.av$s.table)
 
 CAP1.gam.av.p.table<-as.data.frame(CAP1.gam.av.unordered$p.table)
 CAP1.gam.av.s.table<-as.data.frame(CAP1.gam.av$s.table)
@@ -3607,7 +3379,7 @@ ptable.av.community.t<-rbind(richness.gam.av.p.table,
                           evenness.gam.av.p.table,
                           occupied.space.gam.av.p.table,
                           CAP1.gam.av.p.table,
-                          distances.gam.av.p.table,
+                          distcentroid.gam.av.p.table,
                           total_dry_biomass.gam.av.p.table,
                           everything.wet.weight.gam.av.p.table,
                           hydroid_dry_biomass.gam.av.p.table,
@@ -3634,7 +3406,7 @@ ptable.av.community.t %>%
   group_rows("Evenness, normal", 4,6) %>%
   group_rows("Occupied space, beta (z)", 7,9) %>% 
   group_rows("Partial dbRDA (1st axis), normal",10,12) %>% 
-  group_rows("Homogeneity of dispersions, normal", 13,15) %>% 
+  group_rows("Heterogeneity of dispersions, normal", 13,15) %>% 
   group_rows("Total dry biomass, normal", 16,18) %>% 
   group_rows("Total wet biomass, normal (log)", 19,21) %>% 
   group_rows("Obelia dry biomass, gamma", 22,24) %>% 
@@ -3658,7 +3430,7 @@ stable.av.community.f<-rbind(richness.gam.av.s.table,
                           evenness.gam.av.s.table,
                           occupied.space.gam.av.s.table,
                           CAP1.gam.av.s.table,
-                          distances.gam.av.s.table,
+                          distcentroid.gam.av.s.table,
                           total_dry_biomass.gam.av.s.table,
                           everything.wet.weight.gam.av.s.table,
                           hydroid_dry_biomass.gam.av.s.table,
@@ -3685,7 +3457,7 @@ stable.av.community.f %>%
   group_rows("Evenness, normal", 4,6) %>%
   group_rows("Occupied space, beta (Chi square)", 7,9) %>% 
   group_rows("Partial dbRDA (1st axis), normal",10,12) %>% 
-  group_rows("Homogeneity of dispersions, normal", 13,15) %>% 
+  group_rows("Heterogeneity of dispersions, normal", 13,15) %>% 
   group_rows("Total dry biomass, normal", 16,18) %>% 
   group_rows("Total wet biomass, normal (log)", 19,21) %>% 
   group_rows("Obelia dry biomass, gamma", 22,24) %>% 
@@ -3714,940 +3486,11 @@ pstable.av.community %>%
   group_rows("Evenness, normal", 4,6) %>%
   group_rows("Occupied space, beta (Chi-square, z)", 7,9) %>% 
   group_rows("Partial dbRDA (1st axis), normal",10,12) %>% 
-  group_rows("Homogeneity of dispersions, normal", 13,15) %>% 
+  group_rows("Heterogeneity of dispersions, normal", 13,15) %>% 
   group_rows("Total dry biomass, normal", 16,18) %>% 
   group_rows("Total wet biomass, normal (log)", 19,21) %>% 
-  group_rows("Obelia dry biomass, gamma", 22,24) %>% 
-  group_rows("Botryllus dry biomass, gamma", 25,27) %>% 
-  group_rows("Mussel wet biomass, normal (log)", 28,30) %>% 
   group_rows("Botryllus to Obelia dominance ratio, beta (Chi-square, z)", 31,33) %>% 
   group_rows("Botryllus to Obelia dominance ratio by biomass, beta (Chi square, z)", 34,36) %>% 
   
-  save_kable(file = "C:For submission//pstable.av.community.html", self_contained = T)
+  save_kable(file = "C:Data//For submission//For resubmission//pstable.av.community.html", self_contained = T)
 
-
-
-
-
-
-
-# old code ----------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-summary(glm.binomial.hydroid.12.hydrogen)
-profile(glm.binomial.hydroid.12.hydrogen)
-
-resid.ssq <- sum(residuals(glm.binomial.num.nudi.12.hydrogen,type="pearson")^2)  ## sum of squares of Pearson resids
-resid.df <- nrow(food.exp.data.12.2019_zscores)-length(coef(glm.binomial.hydroid.12.hydrogen))        ## estimated resid df (N-p)
-resid.ssq/resid.df                                ## ratio should be approx 1
-
-plot(glm.binomial.num.nudi.12.hydrogen)
-
-library(descr)
-LogRegR2(glm.binomial.num.nudi.12.hydrogen)
-
-library(mgcv)
-qq.gam(glm.binomial.num.nudi.12.hydrogen,pch=16)
-
-
-
-y.transf.betareg <- function(y){  
-  n.obs <- sum(!is.na(y))  
-  (y * (n.obs - 1) + 0.5) / n.obs  
-} 
-
-beta.hydroid.12.1<- betareg(y.transf.betareg(hydroid/100) ~ av.pH*Food.quality, data =  food.exp.data.12.2019_zscores)
-summary(beta.hydroid.12.1)
-plot(beta.hydroid.12.1)
-coeftest(beta.hydroid.12.1)
-
-
-
-
-
-plot(beta.hydroid.12.1)
-plot(beta.hydroid.12.1, which = 6, type = "deviance", sub.caption = "")
-plot(beta.hydroid.12.1, which = 4, type = "deviance", sub.caption = "")
-plot(beta.hydroid.12.1, which = 2, type = "deviance", sub.caption = "")
-plot(beta.hydroid.12.1, which = 5, type = "deviance", sub.caption = "")
-
-
-beta.hydroid.12.2<- betareg(y.transf.betareg(hydroid/100) ~ av.pH*Food.quality, data =  food.exp.data.12.2019_zscores, link="loglog")
-summary(beta.hydroid.12.2)
-plot(beta.hydroid.12.2)
-coeftest(beta.hydroid.12.2)
-
-AIC(beta.hydroid.12.2, beta.hydroid.12.1, beta.hydroid.12.3)
-
-sapply(c("logit", "probit", "cloglog", "cauchit", "loglog"), function(x) logLik(update(beta.hydroid.12.3, link = x)))
-
-beta.hydroid.12.3<- betareg(y.transf.betareg(hydroid/100) ~ hydrogen.concentration*Food.quality, data =  food.exp.data.12.2019_zscores, link="cauchit")
-
-
-coeftest(beta.hydroid.12.3)
-
-
-Anova(beta.hydroid.12.3, "3", test.statistic = "Chisq")
-
-
-beta.hydroid.12.1<- betareg(y.transf.betareg(hydroid/100) ~ hydrogen.concentration*Food.quality , data =  food.exp.data.12.2019_zscores)
-
-sapply(c("logit", "probit", "cloglog", "cauchit", "loglog"), function(x) logLik(update(beta.hydroid.12.1, link = x)))
-
-beta.hydroid.12.2<- betareg(y.transf.betareg(hydroid/100) ~ av.pH*Food.quality , data =  food.exp.data.12.2019_zscores)
-
-sapply(c("logit", "probit", "cloglog", "cauchit", "loglog"), function(x) logLik(update(beta.hydroid.12.2, link = x)))
-
-beta.hydroid.12.3<- betareg(y.transf.betareg(hydroid/100) ~ av.pH*Food.quality , data =  food.exp.data.12.2019_zscores, link="cauchit")
-beta.hydroid.12.4<- betareg(y.transf.betareg(hydroid/100) ~ hydrogen.concentration*Food.quality , data =  food.exp.data.12.2019_zscores,  link="cauchit")
-
-
-AIC(beta.hydroid.12.2, beta.hydroid.12.1, beta.hydroid.12.3, beta.hydroid.12.4)
-
-#best one: 
-beta.hydroid.12.3<- betareg(y.transf.betareg(hydroid/100) ~ av.pH*Food.quality , data =  food.exp.data.12.2019_zscores, link="cauchit")
-
-
-
-# old code
-
-gamma.12<-fitdistr(food.exp.data.12.2019$stand.biomass, "gamma")
-qqp(food.exp.data.12.2019$stand.biomass, "gamma", shape = gamma.12$estimate[[1]], rate = gamma.12$estimate[[2]])
-
-qqp(food.exp.data.12.2019$stand.biomass, "norm")
-
-
-glm.Gamma.stand.biomass.12<- glm(formula = stand.biomass~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = Gamma)
-plot(glm.Gamma.stand.biomass.12)
-summary(glm.Gamma.stand.biomass.12)
-Anova(glm.Gamma.stand.biomass.12, "3")
-
-
-#####bottohyd
-##this for ANOVA (eat treat to mean of others )
-options(contrasts = c("contr.sum", "contr.poly"))
-
-
-###this for Summary (each treatment to ref level)
-options(contrasts = c("contr.treatment", "contr.poly"))
- 
-qqp(food.exp.data.12.2019$bottohyd_dry, "norm")
-
-
-lm.bottohyd_dry<-lm(bottohyd_dry~CO2*Food.quality, data=food.exp.data.12.2019)
-plot(lm.bottohyd_dry)
-summary(lm.bottohyd_dry)
-Anova(lm.bottohyd_dry, type="3")
-
-lm.bottohyd_dry<-lm(bottohyd_dry~hydrogen.concentration*Food.quality, data=food.exp.data.12.2019)
-plot(lm.bottohyd_dry)
-summary(lm.bottohyd_dry)
-Anova(lm.bottohyd_dry, type="3")
-### hydroid_dry
-
-
-
-
-
-
-
-######## 
-glm.gamma.hydroid_dry_biomass_per1.12<-glm(formula = (hydroid_dry_biomass_per1+0.0001) ~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = "Gamma")
-summary(glm.gamma.hydroid_dry_biomass_per1.12)
-plot(glm.gamma.hydroid_dry_biomass_per1.12)
-Anova(glm.gamma.hydroid_dry_biomass_per1.12, type="3")
-####
-
-glm.gamma.tunicate_dry_biomass_per1.12<-glm(formula = (tunicate_dry_biomass_per1_all+0.0001) ~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = "Gamma")
-summary(glm.gamma.tunicate_dry_biomass_per1.12)
-plot(glm.gamma.tunicate_dry_biomass_per1.12)
-Anova(glm.gamma.tunicate_dry_biomass_per1.12, type="3")
-
-###
-glm.gamma.rest_dry_biomass_per1.12<-glm(formula = (rest_dry_biomass_per1+0.0001) ~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = "Gamma")
-summary(glm.gamma.rest_dry_biomass_per1.12)
-plot(glm.gamma.rest_dry_biomass_per1.12)
-Anova(glm.gamma.rest_dry_biomass_per1.12, type="3")
-
-
-###
-lm.caprellid_dry_biomass_per1<-lm(caprellid_dry_biomass_per1~hydrogen.concentration*Food.quality, data=food.exp.data.12.2019)
-plot(lm.caprellid_dry_biomass_per1)
-summary(lm.caprellid_dry_biomass_per1)
-Anova(lm.caprellid_dry_biomass_per1, type="3")
-
-
-
-options(contrasts = c("contr.sum", "contr.poly"))
-
-
-####
-lm.dry_total<-lm(dry_total~hydrogen.concentration*Food.quality, data=food.exp.data.12.2019)
-plot(lm.dry_total)
-summary(lm.dry_total)
-Anova(lm.dry_total, type="3")
-
-lm.dry_total.av<-lm(dry_total~hydrogen.concentration.av*Food.quality, data=food.exp.data.12.2019)
-plot(lm.dry_total.av)
-summary(lm.dry_total.av)
-Anova(lm.dry_total.av, type="3")
-
-lm.dry_total_per1<-lm(dry_total_per1~hydrogen.concentration*Food.quality, data=food.exp.data.12.2019)
-plot(lm.dry_total_per1)
-summary(lm.dry_total_per1)
-Anova(lm.dry_total_per1, type="3")
-
-glm.gamma.dry_total_per1.12<-glm(formula = (dry_total_per1) ~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = "Gamma")
-summary(glm.gamma.dry_total_per1.12)
-plot(glm.gamma.dry_total_per1.12)
-Anova(glm.gamma.dry_total_per1.12, type="3")
-
-#hydroid binomial
-
-#### by hydrogen concentration
-
-contrasts(food.exp.data.12.2019$Food.quality)=contr.poly(3) 
-
-options(contrasts = c("contr.treatment", "contr.poly"))
-options(contrasts = c("contr.sum", "contr.poly"))
-
-
-fitBinom=fitdist(data=food.exp.data.12.2019$hydroid, dist="binom", fix.arg=list(size=100), start=list(prob=0.01))
-qqp(food.exp.data.12.2019$hydroid, "binom", size = 100, prob = fitBinom$estimate[[1]])
-
-
-food.exp.data.12.2019$hydrogen.concentration<- 10^(-food.exp.data.12.2019$av.pH)
-
-glm.binomial.hydroid.12.hydrogen<- glm(formula = cbind(hydroid, 100-hydroid)~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.hydroid.12.hydrogen)
-summary(glm.binomial.hydroid.12.hydrogen)
-profile(glm.binomial.hydroid.12.hydrogen)
-Anova(glm.binomial.hydroid.12.hydrogen, "3", test.statistic = "LR")
-
-1-(1596.4/1711.3)
-
-food.exp.data.12.2019$hydrogen.concentration.av<- 10^(-food.exp.data.12.2019$av.pH)
-glm.binomial.hydroid.12.hydrogen.av<- glm(formula = cbind(hydroid, 100-hydroid)~ hydrogen.concentration.av*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.hydroid.12.hydrogen.av)
-summary(glm.binomial.hydroid.12.hydrogen.av)
-profile(glm.binomial.hydroid.12.hydrogen.av)
-Anova(glm.binomial.hydroid.12.hydrogen.av, "3", test.statistic = "LR")
-
-
-########
-#formicula binomial
-head(food.exp.data.12.2019)
-
-fitBinom=fitdist(data=food.exp.data.12.2019$formicula, dist="binom", fix.arg=list(size=100), start=list(prob=0.01))
-qqp(food.exp.data.12.2019$formicula, "binom", size = 100, prob = fitBinom$estimate[[1]])
-
-glm.binomial.formicula.12<- glm(formula = cbind(formicula, 100-formicula)~ hydrogen.concentration*Food.quality*Mussel.wet.weight, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.formicula.12)
-summary(glm.binomial.formicula.12)
-Anova(glm.binomial.formicula.12, "3")
-
-glm.binomial.formicula.12.av<- glm(formula = cbind(formicula, 100-formicula)~ hydrogen.concentration.av*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.formicula.12.av)
-summary(glm.binomial.formicula.12.av)
-Anova(glm.binomial.formicula.12.av, "3")
-
-
-###
-#nudi.combined binomial
-fitBinom=fitdist(data=food.exp.data.12.2019$nudi.combined, dist="binom", fix.arg=list(size=100), start=list(prob=0.01))
-qqp(food.exp.data.12.2019$nudi.combined, "binom", size = 100, prob = fitBinom$estimate[[1]])
-
-glm.binomial.nudi.combined.12<- glm(formula = cbind(nudi.combined, 100-nudi.combined)~ hydrogen.concentration*Food.quality*Mussel.wet.weight, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.nudi.combined.12)
-
-summary(glm.binomial.nudi.combined.12)
-Anova(glm.binomial.nudi.combined.12, "3")
-
-glm.binomial.nudi.combined.12.av<- glm(formula = cbind(nudi.combined, 100-nudi.combined)~ hydrogen.concentration.av*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.nudi.combined.12.av)
-summary(glm.binomial.nudi.combined.12.av)
-Anova(glm.binomial.nudi.combined.12.av, "3")
-
-### formicula beta
-food.exp.data.12.2019$formicula.2<-(food.exp.data.12.2019$formicula*0.01)+0.01
-y.transf.betareg <- function(y){  
-  n.obs <- sum(!is.na(y))  
-  (y * (n.obs - 1) + 0.5) / n.obs  
-} 
-
-y.transf.betareg(food.exp.data.12.2019$formicula/food.exp.data.12.2019$total) 
-
-beta.12<-fitdist(0.01*(food.exp.data.12.2019$formicula+0.01), "beta", start=NULL)
-qqp(0.01*(food.exp.data.12.2019$formicula+0.01), "beta", shape1 = beta.12$estimate[[1]], shape2 = beta.12$estimate[[2]])
-
-beta.12<-fitdist(y.transf.betareg(food.exp.data.12.2019$formicula/food.exp.data.12.2019$total) , "beta", start=NULL)
-qqp(y.transf.betareg(food.exp.data.12.2019$formicula/food.exp.data.12.2019$total) , "beta", shape1 = beta.12$estimate[[1]], shape2 = beta.12$estimate[[2]])
-
-
-beta.formicula.12.1<- betareg(y.transf.betareg(food.exp.data.12.2019$formicula/food.exp.data.12.2019$total)  ~ av.pH*Food.quality, data =  food.exp.data.12.2019)
-summary(beta.formicula.12.1)
-plot(beta.formicula.12.1)
-Anova(beta.formicula.12.1)
-
-## I think binomial is better fitat lower distrib and the model looks better ... 
-
-#alive.bot binomial
-fitBinom=fitdist(data=food.exp.data.12.2019$alive.bot, dist="binom", fix.arg=list(size=100), start=list(prob=0.01))
-qqp(food.exp.data.12.2019$alive.bot, "binom", size = 100, prob = fitBinom$estimate[[1]])
-
-glm.binomial.alive.bot.12<- glm(formula = cbind(alive.bot, 100-alive.bot)~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.alive.bot.12)
-summary(glm.binomial.alive.bot.12)
-Anova(glm.binomial.alive.bot.12, "3")
-
-glm.binomial.alive.bot.12.av<- glm(formula = cbind(alive.bot, 100-alive.bot)~ hydrogen.concentration.av*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.alive.bot.12.av)
-summary(glm.binomial.alive.bot.12.av)
-Anova(glm.binomial.alive.bot.12.av, "3")
-
-
-#beta is also a good fit ... 
-beta.12<-fitdist(0.01*(food.exp.data.12.2019$alive.bot+0.01), "beta", start=NULL)
-qqp(0.01*(food.exp.data.12.2019$alive.bot+0.01), "beta", shape1 = beta.12$estimate[[1]], shape2 = beta.12$estimate[[2]])
-
-
-
-
-
-#caprellid binomial
-fitBinom=fitdist(data=food.exp.data.12.2019$caprellid, dist="binom", fix.arg=list(size=100), start=list(prob=0.01))
-qqp(food.exp.data.12.2019$caprellid, "binom", size = 100, prob = fitBinom$estimate[[1]])
-
-glm.binomial.caprellid.12<- glm(formula = cbind(caprellid, 100-caprellid)~ hydrogen.concentration*Food.quality*Mussel.wet.weight, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.caprellid.12)
-summary(glm.binomial.caprellid.12)
-Anova(glm.binomial.caprellid.12, "3")
-
-glm.binomial.caprellid.12.av<- glm(formula = cbind(caprellid, 100-caprellid)~ hydrogen.concentration.av*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.caprellid.12.av)
-summary(glm.binomial.caprellid.12.av)
-Anova(glm.binomial.caprellid.12.av, "3")
-
-head(food.exp.data.12.2019)
-#alive.mem binomial
-fitBinom=fitdist(data=food.exp.data.12.2019$alive.mem, dist="binom", fix.arg=list(size=100), start=list(prob=0.01))
-qqp(food.exp.data.12.2019$alive.mem, "binom", size = 100, prob = fitBinom$estimate[[1]])
-
-glm.binomial.alive.mem.12<- glm(formula = cbind(alive.mem, 100-alive.mem)~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.alive.mem.12)
-summary(glm.binomial.alive.mem.12)
-Anova(glm.binomial.alive.mem.12, "3")
-
-glm.binomial.alive.mem.12.av<- glm(formula = cbind(alive.mem, 100-alive.mem)~ hydrogen.concentration.av*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.alive.mem.12.av)
-summary(glm.binomial.alive.mem.12.av)
-Anova(glm.binomial.alive.mem.12.av, "3")
-
-#didemnum binomial
-fitBinom=fitdist(data=food.exp.data.12.2019$didemnum, dist="binom", fix.arg=list(size=100), start=list(prob=0.01))
-qqp(food.exp.data.12.2019$didemnum, "binom", size = 100, prob = fitBinom$estimate[[1]])
-
-glm.binomial.didemnum.12<- glm(formula = cbind(didemnum, 100-didemnum)~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.didemnum.12)
-summary(glm.binomial.didemnum.12)
-Anova(glm.binomial.didemnum.12, "3")
-
-glm.binomial.didemnum.12.av<- glm(formula = cbind(didemnum, 100-didemnum)~ hydrogen.concentration.av*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.didemnum.12.av)
-summary(glm.binomial.didemnum.12.av)
-Anova(glm.binomial.didemnum.12.av, "3")
-
-#bowerbankia binomial
-fitBinom=fitdist(data=food.exp.data.12.2019$bowerbankia, dist="binom", fix.arg=list(size=100), start=list(prob=0.01))
-qqp(food.exp.data.12.2019$bowerbankia, "binom", size = 100, prob = fitBinom$estimate[[1]])
-
-glm.binomial.bowerbankia.12<- glm(formula = cbind(bowerbankia, 100-bowerbankia)~ av.pH*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.bowerbankia.12)
-summary(glm.binomial.bowerbankia.12)
-Anova(glm.binomial.bowerbankia.12, "3")
-
-head(food.exp.data.12.2019)
-
-
-### num.barn.alive
-poisson.12<-fitdistr(food.exp.data.12.2019$num.barn.alive, "Poisson")
-qqp(food.exp.data.12.2019$num.barn.alive, "pois", poisson.12$estimate)
-
-glm.poisson.num.barn.alive.12<-glm(formula = (num.barn.alive) ~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.num.barn.alive.12)
-plot(glm.poisson.num.barn.alive.12)
-Anova(glm.poisson.num.barn.alive.12, type="III")
-
-glm.poisson.num.barn.alive.12.av<-glm(formula = (num.barn.alive) ~ hydrogen.concentration.av*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.num.barn.alive.12.av)
-plot(glm.poisson.num.barn.alive.12.av)
-Anova(glm.poisson.num.barn.alive.12.av, type="III")
-
-
-
-### num.disporella
-poisson.12<-fitdistr(food.exp.data.12.2019$num.disporella, "Poisson")
-qqp(food.exp.data.12.2019$num.disporella, "pois", poisson.12$estimate)
-
-glm.poisson.num.disporella.12<-glm(formula = (num.disporella) ~hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.num.disporella.12)
-plot(glm.poisson.num.disporella.12)
-Anova(glm.poisson.num.disporella.12, type="III")
-
-glm.poisson.num.disporella.12.av<-glm(formula = (num.disporella) ~hydrogen.concentration.av*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.num.disporella.12.av)
-plot(glm.poisson.num.disporella.12.av)
-Anova(glm.poisson.num.disporella.12.av, type="III")
-
-
-
-### num.serpulid
-poisson.12<-fitdistr(food.exp.data.12.2019$num.serpulid, "Poisson")
-qqp(food.exp.data.12.2019$num.serpulid, "pois", poisson.12$estimate)
-
-glm.poisson.num.serpulid.12<-glm(formula = (num.serpulid) ~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.num.serpulid.12)
-plot(glm.poisson.num.serpulid.12)
-Anova(glm.poisson.num.serpulid.12, type = "III")
-
-glm.poisson.num.serpulid.12.av<-glm(formula = (num.serpulid) ~ hydrogen.concentration.av*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.num.serpulid.12.av)
-plot(glm.poisson.num.serpulid.12.av)
-Anova(glm.poisson.num.serpulid.12.av, type = "III")
-
-
-head(food.exp.data.12.2019)
-
-### num.nudi
-poisson.12<-fitdistr(food.exp.data.12.2019$num.nudi, "Poisson")
-qqp(food.exp.data.12.2019$num.nudi, "pois", poisson.12$estimate)
-
-fitBinom=fitdist(data=food.exp.data.12.2019$num.nudi, dist="binom", fix.arg=list(size=1), start=list(prob=0.01))
-qqp(food.exp.data.12.2019$num.nudi, "binom", size = 1, prob = fitBinom$estimate[[1]])
-
-
-glm.poisson.num.nudi.12<-glm(formula = (num.nudi) ~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.num.nudi.12)
-plot(glm.poisson.num.nudi.12)
-anova(glm.poisson.num.nudi.12, test = "Chi")
-
-
-
-glm.binomial.num.nudi.12<-glm(formula = (num.nudi) ~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = "binomial"(link="cloglog"))
-summary(glm.binomial.num.nudi.12)
-plot(glm.binomial.num.nudi.12)
-anova(glm.binomial.num.nudi.12, test = "Chi")
-
-### num.nudi.eggs
-poisson.12<-fitdistr(food.exp.data.12.2019$num.nudi, "Poisson")
-qqp(food.exp.data.12.2019$num.nudi, "pois", lambda=poisson.12$estimate[[1]])
-
-nbinom12 <- fitdistr(food.exp.data.12.2019$num.nudi, "Negative Binomial")
-qqp(food.exp.data.12.2019$num.nudi, "nbinom", size = nbinom12$estimate[[1]], mu = nbinom12$estimate[[2]])
-
-
-glm.neg.binom.num.nudi.eggs.12<-glm.nb(formula = (num.nudi.eggs) ~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019)
-summary(glm.neg.binom.num.nudi.eggs.12)
-plot(glm.neg.binom.num.nudi.eggs.12)
-anova(glm.neg.binom.num.nudi.eggs.12, test = "Chi")
-
-glm.poisson.num.nudi.eggs.12<-glm(formula = (num.nudi.eggs) ~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family="poisson")
-summary(glm.poisson.num.nudi.eggs.12)
-plot(glm.poisson.num.nudi.eggs.12)
-anova(glm.poisson.num.nudi.eggs.12, test = "Chi")
-
-### num.corella
-poisson.12<-fitdistr(food.exp.data.12.2019$num.corella, "Poisson")
-qqp(food.exp.data.12.2019$num.corella, "pois", poisson.12$estimate)
-
-nbinom12 <- fitdistr(food.exp.data.12.2019$num.corella, "Negative Binomial")
-qqp(food.exp.data.12.2019$num.corella, "nbinom", size = nbinom12$estimate[[1]], mu = nbinom12$estimate[[2]])
-
-food.exp.data.12.2019$Food.quality<-as.factor(food.exp.data.12.2019$Food.quality)
-food.exp.data.12.2019$Food.quality<-relevel(food.exp.data.12.2019$Food.quality, "None")
-
-### richness
-library(fitdistrplus)
-poisson.12<-fitdistr(food.exp.data.12.2019$richness, "Poisson")
-qqp(food.exp.data.12.2019$richness, "pois", poisson.12$estimate)
-
-
-glm.poisson.richness.12<-glm(formula = (richness) ~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.richness.12)
-plot(glm.poisson.richness.12)
-Anova(glm.poisson.richness.12, type="3")
-
-glm.poisson.richness.12.av<-glm(formula = (richness) ~ hydrogen.concentration.av*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.richness.12.av)
-plot(glm.poisson.richness.12.av)
-Anova(glm.poisson.richness.12.av, type="3")
-
-glm.poisson.richness.mesotile.12<-glm(formula = (richness.mesotile) ~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.richness.mesotile.12)
-plot(glm.poisson.richness.mesotile.12)
-Anova(glm.poisson.richness.mesotile.12, type="3")
-
-glm.poisson.richness.mesotile.12.av<-glm(formula = (richness.mesotile) ~ hydrogen.concentration.av*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.richness.mesotile.12.av)
-plot(glm.poisson.richness.mesotile.12.av)
-Anova(glm.poisson.richness.mesotile.12.av, type="3")
-
-#use this one for the "summary" part to partition low vs high food. 
-options(contrasts = c("contr.treatment", "contr.poly"))
-
-#use this one for overall model
-options(contrasts = c("contr.sum", "contr.poly"))
-
-
-
-gamma.12<-fitdistr(food.exp.data.12.2019$eveness + 0.01, "gamma")
-qqp(food.exp.data.12.2019$eveness, "gamma", shape = gamma.12$estimate[[1]], rate = gamma.12$estimate[[2]])
-qqp(food.exp.data.12.2019$eveness, "norm")
-
-#lm is better
-
-lm.eveness<-lm(eveness ~ hydrogen.concentration*Food.quality, data=food.exp.data.12.2019)
-plot(lm.eveness)
-summary(lm.eveness)
-Anova(lm.eveness, type="3" )
-
-lm.eveness.av<-lm(eveness ~ hydrogen.concentration.av*Food.quality, data=food.exp.data.12.2019)
-plot(lm.eveness.av)
-summary(lm.eveness.av)
-Anova(lm.eveness.av, type="3" )
-
-head(food.exp.data.12.2019)
-#occupied.space binomial
-fitBinom=fitdist(data=food.exp.data.12.2019$occupied.space, dist="binom", fix.arg=list(size=100), start=list(prob=0.01))
-qqp(food.exp.data.12.2019$occupied.space, "binom", size = 100, prob = fitBinom$estimate[[1]])
-
-glm.binomial.occupied.space.12<- glm(formula = cbind(occupied.space, 100-occupied.space)~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.occupied.space.12)
-summary(glm.binomial.occupied.space.12)
-Anova(glm.binomial.occupied.space.12, "3")
-
-glm.binomial.occupied.space.12.av<- glm(formula = cbind(occupied.space, 100-occupied.space)~ hydrogen.concentration.av*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.occupied.space.12.av)
-summary(glm.binomial.occupied.space.12.av)
-Anova(glm.binomial.occupied.space.12.av, "3")
-
-head(glm.binomial.occupied.space.12)
-fitBinom=fitdist(data=food.exp.data.12.2019$second.occ, dist="binom", fix.arg=list(size=100), start=list(prob=0.01))
-qqp(food.exp.data.12.2019$second.occ, "binom", size = 100, prob = fitBinom$estimate[[1]])
-
-beta.12<-fitdist(0.01*(food.exp.data.12.2019$second.occ+0.01), "beta", start=NULL)
-qqp(0.01*(food.exp.data.12.2019$second.occ+0.01), "beta", shape1 = beta.12$estimate[[1]], shape2 = beta.12$estimate[[2]])
-
-food.exp.data.12.2019$second.occ
-
-food.exp.data.12.2019$second.occ[food.exp.data.12.2019$second.occ==0]<-0.0001
-
-
-beta.second.occ.12.1<- betareg((second.occ) ~ hydrogen.concentration*Food.quality, data =  food.exp.data.12.2019)
-summary(beta.second.occ.12.1)
-plot(beta.second.occ.12)
-plot(beta.second.occ.12.1, which = 6, type = "deviance", sub.caption = "")
-plot(beta.second.occ.12.1, which = 4, type = "deviance", sub.caption = "")
-plot(beta.second.occ.12.1, which = 1, type = "deviance", sub.caption = "")
-Anova(beta.second.occ.12.1, test="Chi")
-
-
-
-glm.binomial.second.occ.12<- glm(formula = cbind(second.occ, occupied.space-second.occ)~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = binomial(link="logit"))
-plot(glm.binomial.second.occ.12)
-summary(glm.binomial.second.occ.12)
-Anova(glm.binomial.second.occ.12, "3")
-
-
-cbind(food.exp.data.12.2019$occupied.space, 100-food.exp.data.12.2019$occupied.space)
-
-require(pscl)
-
-glm.poisson.num.corella.12<-glm(formula = (num.corella) ~hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.num.corella.12)
-plot(glm.poisson.num.corella.12)
-anova(glm.poisson.num.corella.12, test = "Chi")
-
-
-glm.poisson.num.corella.12<-zeroinfl(num.corella ~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019, dist = "negbin")
-summary(glm.poisson.num.corella.12)
-plot(glm.poisson.num.corella.12)
-anova(glm.poisson.num.corella.12, test = "Chi")
-
-glm.neg.binom.num.corella.12<-glm.nb(formula = (num.corella) ~ hydrogen.concentration*Food.quality, data = food.exp.data.12.2019)
-summary(glm.neg.binom.num.corella.12)
-plot(glm.neg.binom.num.corella.12)
-anova(glm.neg.binom.num.corella.12, test = "Chi")
-
-
-### whatabout pairwise differences between the levels?? 
-### is there to testing whether there is any heterogeneity in the means of the levels of the predictor is what ANOVS is doing ... 
-
-library(fitdistrplus)
-library
-nbinom12 <- fitdistr(food.exp.data.12.2019$hydroid, "Negative Binomial")
-qqp(food.exp.data.12.2019$hydroid, "nbinom", size = nbinom12$estimate[[1]], mu = nbinom12$estimate[[2]])
-
-glm.neg.binomial.hydroid.12<- glm.nb(hydroid~ av.pH*Food.quality, data = food.exp.data.12.2019)
-plot(glm.neg.binomial.hydroid.12)
-summary(glm.neg.binomial.hydroid.12)
-Anova(glm.neg.binomial.hydroid.12, type=3)
-
-library(mgcv)
-library(car)
-influencePlot(glm.binomial.hydroid.12.1.hydrogen)
-
-
-qqp(food.exp.data.12.2019$hydroid, "norm")
-hydroid.lm<-lm(hydroid~av.pH*Food.quality, data = food.exp.data.12.2019)
-summary(hydroid.lm)
-anova(hydroid.lm, test = "Chi")
-
-####### try a gam
-gam.av.hydroid.12<- gam(0.01*hydroid ~ s(av.pH, fx=FALSE, k=-1, bs="cr")*Food.quality, data = food.exp.data.12.2019_zscores, family = binomial)
-plot(gam.av.hydroid.12)
-summary(gam.av.hydroid.12)
-
-
-anova(gam.av.hydroid.12, glm.binomial.hydroid.12.hydrogen)
-
-#### quasibinomial
-glm.quasi.hydroid.12<- glm(0.01*hydroid ~ av.pH*Food.quality, data = food.exp.data.12.2019_zscores, family = quasibinomial(link="probit"))
-plot(glm.quasi.hydroid.12)
-summary(glm.quasi.hydroid.12)
-drop1(glm.quasi.hydroid.12, test="F")
-AIC(glm.quasi.hydroid.12)
-
-simulationOutput.beta <- simulateResiduals(fittedModel = glm.binomial.hydroid.12.hydrogen)
-plotSimulatedResiduals(simulationOutput = simulationOutput.beta)
-testZeroInflation(simulationOutput.beta)
-testUniformity(simulationOutput = simulationOutput.beta)
-testDispersion(simulationOutput = simulationOutput.beta)
-
-#hydroid
-head(food.exp.data.12.2019_zscores)
-
-glm.overdispersed.hydroid<- glmer(formula = cbind(hydroid, 100-hydroid)~ av.pH*Food.quality + (1|Mesocosm), data = food.exp.data.12.2019_zscores, family =binomial("logit"))
-plot(glm.overdispersed.hydroid)
-hydroid.Anova<- Anova(glm.binomial.hydroid.12.hydrogen, "3", test.statistic = "Chi")
-summary(glm.overdispersed.hydroid)
-library(gridExtra)
-library(grid)
-library(ggplot2)
-library(lattice)
-
-cmod_lme4_L<-glm.overdispersed.hydroid
-p1 <- plot(cmod_lme4_L,id=0.05,idLabels=~.obs)
-p2 <- plot(cmod_lme4_L,ylim=c(-1.5,1),type=c("p","smooth"))
-grid.arrange(p1,p2,nrow=1)
-
-plot(cmod_lme4_L,Food.quality~resid(.,type="pearson"),xlim=c(-1.5,1))
-
-dotplot(ranef(cmod_lme4_L,condVar=TRUE))
-
-
-
-
-
-
-########
-##### Beta
-logit.hyd<-fitdistr(food.exp.data.12.2019$hydroid, "logistic")
-
-# beta regression ---------------------------------------------------------
-
-
-qqp(food.exp.data.12.2019$hydroid, "logit", location=logit.hyd$estimate[[1]], scale=logit.hyd$estimate[[2]])
-?qqp
-beta.12<-fitdist(0.01*(food.exp.data.12.2019$hydroid+0.01), "beta", start=NULL)
-qqp(0.01*(food.exp.data.12.2019$hydroid+0.01), "beta", shape1 = beta.12$estimate[[1]], shape2 = beta.12$estimate[[2]])
-
-
-
-
-beta.12<-fitdist(food.exp.data.12.2019$hydroid.2, "beta", start=NULL)
-qqp(food.exp.data.12.2019$hydroid.2, "beta", shape1 = beta.12$estimate[[1]], shape2 = beta.12$estimate[[2]])
-
-beta.12<-fitdist(food.exp.data.12.2019$hydroid.3, "beta", start=NULL)
-qqp(food.exp.data.12.2019$hydroid.3, "beta", shape1 = beta.12$estimate[[1]], shape2 = beta.12$estimate[[2]])
-
-food.exp.data.12.2019$hydroid.2<-0.01*(food.exp.data.12.2019$hydroid+0.01)
-food.exp.data.12.2019$hydroid.3<-(food.exp.data.12.2019$hydroid/food.exp.data.12.2019$occupied.space)+0.01
-
-beta.hydroid.12.1<- betareg(hydroid.2 ~ av.pH*Food.quality, data =  food.exp.data.12.2019)
-summary(beta.hydroid.12.1)
-plot(beta.hydroid.12)
-plot(beta.hydroid.12, which = 6, type = "deviance", sub.caption = "")
-plot(beta.hydroid.12, which = 4, type = "deviance", sub.caption = "")
-plot(beta.hydroid.12, which = 1, type = "deviance", sub.caption = "")
-
-gy_logit4 <- update(beta.hydroid.12.1, subset = -3)
-
-coef(beta.hydroid.12, model = "precision")
-coef(gy_logit4, model = "precision")
-
-
-### beta regression with av.pH as an additional regressor for the precision parameterto account for heteroskedasticit
-beta.hydroid.12.2<- betareg(hydroid.2 ~ av.pH*Food.quality|av.pH, data =  food.exp.data.12.2019)
-beta.hydroid.12.3<- betareg(hydroid.2 ~ av.pH*Food.quality|Food.quality, data =  food.exp.data.12.2019)
-beta.hydroid.12.4<- betareg(hydroid.2 ~ av.pH*Food.quality|Food.quality, data =  food.exp.data.12.2019, link="probit")
-beta.hydroid.12.5<- betareg(hydroid.2 ~ av.pH*Food.quality|Food.quality, data =  food.exp.data.12.2019, link="loglog")
-
-
-lrtest(beta.hydroid.12.1, beta.hydroid.12.2)
-lrtest(beta.hydroid.12.1, beta.hydroid.12.5)
-
-
-beta.hydroid.12.space<- betareg(hydroid.3 ~ av.pH*Food.quality, data =  food.exp.data.12.2019)
-plot(beta.hydroid.12.space, which = 1:5, type = "deviance", sub.caption = "")
-summary(beta.hydroid.12.space)
-cooks.distance(beta.hydroid.12.space)
-AIC(beta.hydroid.12.1)
-AIC(beta.hydroid.12.6)
-
-
-beta.hydroid.12.6<- betareg(hydroid.2 ~ av.pH*Food.quality, data =  food.exp.data.12.2019)
-
-devtools::install_github("hilaryparker/explainr")
-library(explainr)
-
-summary(beta.hydroid.12.5)
-plot(beta.hydroid.12)
-plot(beta.hydroid.12, which = 5, type = "deviance", sub.caption = "")
-
-
-Anova(beta.hydroid.12.space, type=3)
-fitBinom=fitdist(data=scorebinom, dist="binom", fix.arg=list(size=8), start=list(prob=0.3))
-
-binom.12<-fitdist(food.exp.data.12.2019$hydroid.2, "binom", fix.arg=list(size=10), start=list(prob=0.3))
-qqp(rbinom(food.exp.data$num.prop.disporella.erect), size=0.1)
-
-?fitdist
-
-
-
-?betareg
-library(betareg)
-library(lmtest)
-
-# test of constant precision based on beta distribution:
-cp = betareg(av.pH~hydroid, food.exp.data.12.2019)
-vp = betareg(x~f|f, df)
-lrtest(cp, vp)
-
-glm.quasi.hydroid.12<- glm(hydroid.2 ~ av.pH*Food.quality, data = food.exp.data.12.2019, family = quasibinomial(link="probit"))
-summary(glm.quasi.hydroid.12)
-
-
-#### beta binomial from https://cran.r-project.org/web/packages/bbmle/vignettes/mle2.pdf
-install.packages("bbmle")
-install.packages("emdbook")
-library("bbmle")
-load(system.file("vignetteData","orob1.rda",package="bbmle"))
-summary(orob1)
-head(orob1)
-
-set.seed(1001)
-library(emdbook)
-x1 <- rbetabinom(n=1000,prob=0.1,size=50,theta=10)
-
-mtmp <- function(prob,size,theta) {
-  -sum(dbetabinom(x1,prob,size,theta,log=TRUE))
-}
-m0 <- mle2(mtmp,start=list(prob=0.2,theta=9),data=list(size=50))
-
-
-ML1 <- function(prob1,prob2,prob3,theta,food.exp.data.12.2019) {
-  prob <- c(prob1,prob2,prob3)[as.numeric(food.exp.data.12.2019$hydroid)]
-  size <- food.exp.data.12.2019$occupied.space
-  -sum(dbetabinom(food.exp.data.12.2019$av.pH,prob,size,theta,log=TRUE))
-}
-
-m1 <- mle2(ML1,start=list(prob1=0.5,prob2=0.5,prob3=0.5,theta=1),
-            data=list(food.exp.data.12.2019=food.exp.data.12.2019))
-
-
-
-
-ML1 <- function(prob1,prob2,prob3,theta,x) {
-  prob <- c(prob1,prob2,prob3)[as.numeric(x$dilution)]
-  size <- x$n
-  -sum(dbetabinom(x$m,prob,size,theta,log=TRUE))
-}
-
-
-
-
-
-
-
-#Disporella percent
-head(food.exp.data.12.2019)
-food.exp.data.12.2019$disporella<-(food.exp.data.12.2019$disporella)*0.01
-glm.binomial.disporella.12<- glm(formula = cbind(disporella, 1.0001-disporella)~ av.pH*Food.quality, data = food.exp.data.12.2019, family = "binomial")
-plot(glm.binomial.disporella.12)
-summary(glm.binomial.disporella.12)
-anova(glm.binomial.disporella.12, test = "Chi")
-
-
-### Number Disporella
-nbinom12 <- fitdistr(food.exp.data.12.2019$num.disporella, "Negative Binomial")
-qqp(food.exp.data.12.2019$num.disporella, "nbinom", size = nbinom12$estimate[[1]], mu = nbinom12$estimate[[2]])
-
-
-poisson.12<-fitdistr(food.exp.data.12.2019$num.disporella, "Poisson")
-qqp(food.exp.data.12.2019$num.disporella, "pois", poisson.12$estimate)
-
-glm.poisson.num.disporella.12<-glm(formula = (num.disporella) ~ av.pH*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.num.disporella.12)
-plot(glm.poisson.num.disporella.12)
-anova(glm.poisson.num.disporella.12, test = "Chi")
-
-
-glm.nb.num.disporella.12<-glm.nb(formula = (num.disporella) ~ av.pH*Food.quality, data = food.exp.data.12.2019)
-summary(glm.nb.num.disporella.12)
-anova(glm.nb.num.disporella.12, test = "Chi")
-
-
-visreg(glm.poisson.num.disporella.12, xvar = "av.pH", by= "Food.quality", whitespace = 0.4, 
-       points.par = list(cex = 1.1, col = "red"))
-
-
-### Proportion erect. all
-food.exp.data.12.2019$num.prop.disporella.erect<-(food.exp.data.12.2019$num.disporella.erect.all)/(food.exp.data.12.2019$num.disporella)
-
-glm.binomial.num.prop.disporella.erect.12<- glm(formula = cbind(num.prop.disporella.erect, 1-num.prop.disporella.erect)~ av.pH*Food.quality, data = food.exp.data.12.2019, family = "binomial")
-plot(glm.binomial.num.prop.disporella.erect.12)
-
-summary(glm.binomial.num.prop.disporella.erect.12)
-anova(glm.binomial.num.prop.disporella.erect.12, test = "Chi")
-
-
-
-### Proportion erect.knobs
-food.exp.data.12.2019$num.prop.disporella.erect.knobs<-(food.exp.data.12.2019$num.disporella.erect.knobs)/(food.exp.data.12.2019$num.disporella)
-
-glm.binomial.num.prop.disporella.erect.knobs.12<- glm(formula = cbind(num.prop.disporella.erect.knobs, 1-num.prop.disporella.erect.knobs)~ av.pH*Food.quality, data = food.exp.data.12.2019, family = "binomial")
-plot(glm.binomial.num.prop.disporella.erect.knobs.12)
-
-summary(glm.binomial.num.prop.disporella.erect.knobs.12)
-anova(glm.binomial.num.prop.disporella.erect.knobs.12, test = "Chi")
-
-### Proportion flat. all
-food.exp.data.12.2019$num.prop.disporella.flat<-(food.exp.data.12.2019$num.disporella.flat)/(food.exp.data.12.2019$num.disporella)
-
-glm.binomial.num.prop.disporella.flat.12<- glm(formula = cbind(num.prop.disporella.flat, 1-num.prop.disporella.flat)~ av.pH*Food.quality, data = food.exp.data.12.2019, family = "binomial")
-plot(glm.binomial.num.prop.disporella.flat.12)
-
-summary(glm.binomial.num.prop.disporella.flat.12)
-anova(glm.binomial.num.prop.disporella.flat.12, test = "Chi")
-
-### Proportion ruffles. all
-food.exp.data.12.2019$num.prop.disporella.ruffles<-(food.exp.data.12.2019$num.disporella.erect.ruffles)/(food.exp.data.12.2019$num.disporella)
-
-glm.binomial.num.prop.disporella.ruffles.12<- glm(formula = cbind(num.prop.disporella.ruffles, 1-num.prop.disporella.ruffles)~ av.pH*Food.quality, data = food.exp.data.12.2019, family = "binomial")
-plot(glm.binomial.num.prop.disporella.ruffles.12)
-
-summary(glm.binomial.num.prop.disporella.ruffles.12)
-anova(glm.binomial.num.prop.disporella.ruffles.12, test = "Chi")
-
-
-### Proportion fan. all
-food.exp.data.12.2019$num.prop.disporella.fan<-(food.exp.data.12.2019$num.disporella.erect.fan)/(food.exp.data.12.2019$num.disporella)
-
-glm.binomial.num.prop.disporella.fan.12<- glm(formula = cbind(num.prop.disporella.fan, 1-num.prop.disporella.fan)~ av.pH*Food.quality, data = food.exp.data.12.2019, family = "binomial")
-plot(glm.binomial.num.prop.disporella.fan.12)
-
-summary(glm.binomial.num.prop.disporella.fan.12)
-anova(glm.binomial.num.prop.disporella.fan.12, test = "Chi")
-
-#### Num. erect fan
-
-poisson.12<-fitdistr(food.exp.data.12.2019$num.disporella.erect.fan, "Poisson")
-qqp(food.exp.data.12.2019$num.disporella.erect.fan, "pois", poisson.12$estimate)
-
-glm.poisson.num.disporella.erect.fan.12<-glm(formula = (num.disporella.erect.fan) ~ av.pH*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.num.disporella.erect.fan.12)
-plot(glm.poisson.num.disporella.erect.fan.12)
-anova(glm.poisson.num.disporella.erect.fan.12, test = "Chi")
-
-#### Num ruffled
-poisson.12<-fitdistr(food.exp.data.12.2019$num.disporella.erect.ruffles, "Poisson")
-qqp(food.exp.data.12.2019$num.disporella.erect.ruffles, "pois", poisson.12$estimate)
-
-glm.poisson.num.disporella.erect.ruffles.12<-glm(formula = (num.disporella.erect.ruffles) ~ av.pH*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.num.disporella.erect.ruffles.12)
-plot(glm.poisson.num.disporella.erect.ruffles.12)
-anova(glm.poisson.num.disporella.erect.ruffles.12, test = "Chi")
-
-
-###Num knobs
-poisson.12<-fitdistr(food.exp.data.12.2019$num.disporella.erect.knobs, "Poisson")
-qqp(food.exp.data.12.2019$num.disporella.erect.knobs, "pois", poisson.12$estimate)
-
-glm.poisson.num.disporella.erect.knobs.12<-glm(formula = (num.disporella.erect.knobs) ~ av.pH*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.num.disporella.erect.knobs.12)
-plot(glm.poisson.num.disporella.erect.knobs.12)
-anova(glm.poisson.num.disporella.erect.knobs.12, test = "Chi")
-
-### Num didemnum
-poisson.12<-fitdistr(food.exp.data.12.2019$num.didemnum, "Poisson")
-qqp(food.exp.data.12.2019$num.didemnum, "pois", poisson.12$estimate)
-
-glm.poisson.num.didemnum.12<-glm(formula = (num.didemnum) ~ av.pH*Food.quality, data = food.exp.data.12.2019, family = "poisson")
-summary(glm.poisson.num.didemnum.12)
-plot(glm.poisson.num.didemnum.12)
-anova(glm.poisson.num.didemnum.12, test = "Chi")
-
-
-
-####################### NORMAL
-library(lme4)
-
-
-qqp(log(food.exp.data.12.2019$richness+1), "norm")
-
-qqp(food.exp.data.12.2019$richness, "lnorm")
-
-qqp(sqrt(food.exp.data.12.2019$richness), "norm")
-
-lm.hydroid<-lm(formula = log(hydroid+1) ~ av.pH*Food.quality, data = food.exp.data.12.2019)
-summary(lm.hydroid)
-
-
-summary(lm.richness)
-plot(lm.richness)
-anova(lm.richness, test = "F")
-
-
-lognormal.12<-fitdistr(food.exp.data.12.2019$richness+0.01, "lognormal")
-qqp(food.exp.data.12.2019$richness, "lnorm", lognormal.12$estimate)
-
-
-glm.gamma.richness.12<- glm(formula = richness ~ av.pH*Food.quality, data = food.exp.data.12.2019, family = "lognormal")
-
-
-qqp(food.exp.data.12.2019$richness, "lnorm")
-?glm
-?qqp
-
-visreg(lm.richness, xvar = "av.pH", by= "Food.quality", whitespace = 0.4, 
-       points.par = list(cex = 1.1, col = "red"))
-
-
-
-
-###might need gamlss pacage to do exponential functions

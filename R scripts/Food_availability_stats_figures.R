@@ -2780,7 +2780,8 @@ fig.s1.hydtobot<-plot_grid(plt.gam.hydtobot, plt.gam.hydtobot_dry_biomass, legen
 
 fig.s1.hydtobot
 
-ggplot2::ggsave("C:Data//For submission//Supplemental//Fig.S1.hydotobot.png", width=26, height=12, units="cm")
+ggplot2::ggsave("C:Data//For submission//For resubmission//Fig.S1.hydotobot.png", width=26, height=12, units="cm")
+
 
 
 # Community level tables --------------------------------------------------
