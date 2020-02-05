@@ -137,12 +137,12 @@ cbbPalette.all.2<- c( "#F8766D", "#F8766D", "#00BA38" , "#00BA38", "#619CFF", "#
 
 capscale_plot<- function(m, colorby){
   colorby<-factor(colorby) #Convert to factor (just in case it isn't already)
-  cols <- cbbPalette.all.2#vector of colors needed
+  cols <- colorset6#vector of colors needed
   shapesies<-c( 16,2,16,2,16,2)
   ordiplot(m, display = c("sites"), type = "n")
   #ordisurf(m ~ min.10.pH, data=compiled.data_zscores, method = "REML", select = TRUE)
   points(m, col = cols[colorby], pch = shapesies[colorby], cex=1.5)
-  legend("topright", title ="Food  CO2", legend=levels(colorby), col=cols, pch = shapesies, cex=1)
+  legend("topright", title ="Food  CO2", legend=levels(colorby), col=cols, pch = shapesies, cex=.5)
 }
 
 
@@ -154,6 +154,9 @@ head(compiled.data_zscores)
 
 
 # Bray-Curtis Capscale / constrained ordination -------------------------------------------------------------
+colorset2 = c("High"="#F8A02E" ,"Low"="#439E5F","None"= "#666666")
+colorset6 = c("HighAmbient"="#F8A02E", "HighElevated"="#F8A02E" ,"LowAmbient"="#439E5F", "LowElevated"="#439E5F","NoneAmbient"= "#666666", "NoneElevated"= "#666666")
+
 
 #Standardizing by total of the species either percent or count
 # This makes each species on their own scale, so the mesocosm got x % of the total mussels for eg.
