@@ -158,6 +158,7 @@ colorset2 = c("High"="#F8A02E" ,"Low"="#439E5F","None"= "#666666")
 colorset6 = c("HighAmbient"="#F8A02E", "HighElevated"="#F8A02E" ,"LowAmbient"="#439E5F", "LowElevated"="#439E5F","NoneAmbient"= "#666666", "NoneElevated"= "#666666")
 
 
+
 #Standardizing by total of the species either percent or count
 # This makes each species on their own scale, so the mesocosm got x % of the total mussels for eg.
 standardized.species.rec_cover<-decostand(just.species.rec_cover, method="total", MARGIN=2)

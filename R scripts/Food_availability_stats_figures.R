@@ -1076,6 +1076,36 @@ plt.num.serpulid <- ggplot(ndata.num.serpulid, aes(x = min.10.pH.unscaled, y = f
 plt.num.serpulid
 ggsave("C:Data//Graphs December 2019//num.serpulid_pred.png")
 
+colorset2 = c("High"="#F8A02E" ,"Low"="#439E5F","None"= "#666666")
+colorset_none = c("High"="#FFFFFF" ,"Low"="#FFFFFF","None"= "#666666")
+colorset_low = c("High"="#FFFFFF" ,"Low"="#439E5F","None"= "#666666")
+
+### Plot for powerpoint:
+plt.num.serpulid <- ggplot(ndata.num.serpulid, aes(x = min.10.pH.unscaled, y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes(colour=oFood.quality)) +
+  geom_point(aes(y = num.serpulid, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop("Serpulid abundance", paste("(# of individuals)"))))+  
+  scale_color_manual(values=colorset_none)+
+  scale_fill_manual(values=colorset_none)+
+  scale_shape_manual(values=c(19,17))+
+  geom_ribbon(data = ndata.num.serpulid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
+  theme(legend.position="none")
+plt.num.serpulid
+ggsave("C:Data//Graphs December 2019//num.serpulid_pred_none.png")
+
+plt.num.serpulid <- ggplot(ndata.num.serpulid, aes(x = min.10.pH.unscaled, y = fit)) + 
+  theme_classic()+
+  geom_line(size=1.5, aes(colour=oFood.quality)) +
+  geom_point(aes(y = num.serpulid, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop("Serpulid abundance", paste("(# of individuals)"))))+  
+  scale_color_manual(values=colorset_low)+
+  scale_fill_manual(values=colorset_low)+
+  scale_shape_manual(values=c(19,17))+
+  geom_ribbon(data = ndata.num.serpulid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
+  theme(legend.position="none")
+plt.num.serpulid
+ggsave("C:Data//Graphs December 2019//num.serpulid_pred_low.png")
 
 # GAM negbin orange sponge / gam.nb.orange_sponge.12 -------------------------------------------------------
 
