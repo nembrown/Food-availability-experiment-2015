@@ -149,7 +149,8 @@ food.caprellid.data_zscores$Food.quality<-factor(food.caprellid.data_zscores$Foo
 # Plotting settings -------------------------------------------------------
 
 colorset2 = c("High"="#F8A02E" ,"Low"="#439E5F","None"= "#666666")
-theme_set(theme_classic(base_size = 6)) 
+theme_set(theme_classic(base_size = 6))
+theme_update(plot.margin = unit(c(0,0,0,0), "cm"))
 
 
 
@@ -215,11 +216,11 @@ plt.gam.hydroid <- ggplot(ndata.hydroid, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = hydroid.001, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Obelia")~ "abundance"), textstyle("(proportion cover)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.hydroid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.gam.hydroid 
 ggsave("C:Data//Graphs March 2020//hydroid_pred.png")
 
@@ -286,11 +287,11 @@ plt.alive.bot <- ggplot(ndata.alive.bot, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = alive.bot.001, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Botryllus")~ "abundance"), textstyle("(proportion cover)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.alive.bot,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.alive.bot
 ggsave("C:Data//Graphs March 2020//alive.bot_pred.png")
 
@@ -354,11 +355,11 @@ plt.caprellid <- ggplot(ndata.caprellid, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = log(total.caprellids+1), shape=CO2, colour=oFood.quality), data = food.caprellid.data_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Caprella")~ "abundance"), textstyle("(Log # of individuals)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.caprellid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.caprellid
 
 ggsave("C:Data//Graphs March 2020//caprellid_pred.png")
@@ -426,11 +427,11 @@ plt.caprellid.percent <- ggplot(ndata.caprellid.percent, aes(x = min.10.pH.unsca
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = caprellid.percent.001, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Caprella")~ "abundance"), textstyle("(proportion cover)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.caprellid.percent,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.caprellid.percent
 ggsave("C:Data//Graphs March 2020//caprellid.percent_pred.png")
 
@@ -494,11 +495,11 @@ plt.formicula <- ggplot(ndata.formicula, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = formicula.001, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Folliculina")~ "abundance"), textstyle("(proportion cover)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.formicula,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.formicula
 ggsave("C:Data//Graphs March 2020//formicula_pred.png")
 
@@ -564,11 +565,11 @@ plt.alive.mem <- ggplot(ndata.alive.mem, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = alive.mem.001, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Membranipora")~ "abundance"), textstyle("(proportion cover)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.alive.mem,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.alive.mem
 ggsave("C:Data//Graphs March 2020//alive.mem_pred.png")
 
@@ -635,11 +636,11 @@ plt.didemnum <- ggplot(ndata.didemnum, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = didemnum.001, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Didemnum")~ "abundance"), textstyle("(proportion cover)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.didemnum,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.didemnum
 ggsave("C:Data//Graphs March 2020//didemnum_pred.png")
 
@@ -715,11 +716,11 @@ plt.mussel_complete <- ggplot(ndata.mussel_complete, aes(x = min.10.pH.unscaled,
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = mussel_complete, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Mytilus")~ "abundance"), textstyle("(# of individuals)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.mussel_complete,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.mussel_complete
 ggsave("C:Data//Graphs March 2020//mussel_complete_pred.png")
 
@@ -789,11 +790,11 @@ plt.num.barn.alive <- ggplot(ndata.num.barn.alive, aes(x = min.10.pH.unscaled, y
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = num.barn.alive, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Balanus")~ "abundance"), textstyle("(# of individuals)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.num.barn.alive,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.num.barn.alive
 ggsave("C:Data//Graphs March 2020//num.barn.alive_pred.png")
 
@@ -864,11 +865,11 @@ plt.disporella <- ggplot(ndata.disporella, aes(x = min.10.pH.unscaled, y = fit))
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = disporella, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Disporella")~ "abundance"), textstyle("(# of colonies)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.disporella,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.disporella
 ggsave("C:Data//Graphs March 2020//disporella_pred.png")
 
@@ -936,11 +937,11 @@ plt.schizo <- ggplot(ndata.schizo, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = schizo, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Schizoporella")~ "abundance"), textstyle("(# of colonies)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.schizo,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.schizo
 ggsave("C:Data//Graphs March 2020//schizo_pred.png")
 
@@ -997,15 +998,14 @@ ndata.num.nudi$min.10.pH.unscaled<-ndata.num.nudi$min.10.pH * attr(food.exp.data
 
 # plot 
 plt.num.nudi <- ggplot(ndata.num.nudi, aes(x = min.10.pH.unscaled, y = fit)) + 
-  
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = num.nudi, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Hermissenda")~ "abundance"), textstyle("(# of individuals)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.num.nudi,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='bottom', legend.box='horizontal', legend.spacing=unit(0, "cm"), legend.margin=margin(0, 0.05, 0, 0, "cm"), legend.key.size = unit(0, "cm"), legend.text = element_text(size=3), legend.title = element_text(size=4))
 plt.num.nudi
 ggsave("C:Data//Graphs March 2020//num.nudi_pred.png")
 
@@ -1073,11 +1073,11 @@ plt.num.serpulid <- ggplot(ndata.num.serpulid, aes(x = min.10.pH.unscaled, y = f
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = num.serpulid, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle("Serpulid abundance"), textstyle("(# of individuals)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.num.serpulid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.num.serpulid
 ggsave("C:Data//Graphs March 2020//num.serpulid_pred.png")
 
@@ -1093,9 +1093,9 @@ ggsave("C:Data//Graphs March 2020//num.serpulid_pred.png")
 #   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle("Serpulid abundance"), textstyle("(# of individuals)")))))+  
 #   scale_color_manual(values=colorset_none)+
 #   scale_fill_manual(values=colorset_none)+
-#   scale_shape_manual(values=c(19,17))+
+#   scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
 #   geom_ribbon(data = ndata.num.serpulid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-#   theme(legend.position="none")
+#   theme(legend.position='none')
 # plt.num.serpulid
 # ggsave("C:Data//Graphs March 2020//num.serpulid_pred_none.png")
 # 
@@ -1106,9 +1106,9 @@ ggsave("C:Data//Graphs March 2020//num.serpulid_pred.png")
 #   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle("Serpulid abundance"), textstyle("(# of individuals)")))))+  
 #   scale_color_manual(values=colorset_low)+
 #   scale_fill_manual(values=colorset_low)+
-#   scale_shape_manual(values=c(19,17))+
+#   scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
 #   geom_ribbon(data = ndata.num.serpulid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-#   theme(legend.position="none")
+#   theme(legend.position='none')
 # plt.num.serpulid
 # ggsave("C:Data//Graphs March 2020//num.serpulid_pred_low.png")
 # 
@@ -1168,11 +1168,11 @@ plt.orange_sponge <- ggplot(ndata.orange_sponge, aes(x = min.10.pH.unscaled, y =
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = orange_sponge, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle("Sponge abundance"), textstyle("(# of individuals)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.orange_sponge,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.orange_sponge
 ggsave("C:Data//Graphs March 2020//orange_sponge_pred.png")
 
@@ -1233,11 +1233,11 @@ plt.num.corella <- ggplot(ndata.num.corella, aes(x = min.10.pH.unscaled, y = fit
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = num.corella, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Corella")~ "abundance"), textstyle("(# of individuals)")))))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.num.corella,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.num.corella
 ggsave("C:Data//Graphs March 2020//num.corella_pred.png")
 
@@ -1299,61 +1299,30 @@ ndata.clam$min.10.pH.unscaled<-ndata.clam$min.10.pH * attr(food.exp.data.12.2019
 
 # plot 
 plt.clam <- ggplot(ndata.clam, aes(x = min.10.pH.unscaled, y = fit)) + 
-  
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = clam, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Clam abundance\n(# of individuals)")+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.clam,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.clam
 ggsave("C:Data//Graphs March 2020//clam_pred.png")
 
 
-### legend plot
-par(xpd = NA, # switch off clipping, necessary to always see axis labels
-    bg = "transparent", # switch off background to avoid obscuring adjacent plots
-    oma = c(2, 2, 0, 0), # move plot to the right and up
-    mgp = c(2, 1, 0) # move axis labels closer to axis
-) 
-
-plt.legend <- ggplot(ndata.clam, aes(x = min.10.pH.unscaled, y = fit)) + 
-  geom_line(aes(colour=oFood.quality)) +
-  geom_point(aes(y = clam, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Clam abundance\n(# of individuals)")+  
-  scale_color_manual(values=colorset2, name = "Food supplementation", labels = c("None", "Low-quality", "High-quality"))+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17), name = "pH", labels = c("Ambient", "Low pH"))+
-  guides(color = guide_legend(order = 2), shape = guide_legend(order = 1), fill = FALSE)+
-  geom_ribbon(data = ndata.clam,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position='bottom', 
-        legend.justification='right',
-        legend.direction='horizontal')+
-  theme(plot.margin = unit(c(0, 0, 0, 3), "in"))
-plt.legend 
-
-legend_food <- get_legend(plt.legend)
-
-
-
-
-plot(legend_food)
-
 # Fig 2 plot generation ---------------------------------------------------
 library(patchwork)
-fig.2<-plot_grid(plt.gam.hydroid,plt.alive.bot,plt.formicula,plt.caprellid.percent,plt.alive.mem,plt.didemnum,
+fig.2<-wrap_plots(plt.gam.hydroid,plt.alive.bot,plt.formicula,plt.caprellid.percent,plt.alive.mem,plt.didemnum,
           plt.mussel_complete,plt.num.barn.alive,plt.disporella,plt.schizo,plt.num.nudi,plt.num.serpulid,
-          plt.orange_sponge,plt.num.corella,plt.clam,legend_food, ncol=5, rel_heights = c(1,1,1,.2),label_size=7,axis='l', align='v',
-          labels=c('(a)', '(b)','(c)', '(d)', '(e)', '(f)', '(g)', 
-                   '(h)', '(i)', '(j)','(k)','(l)','(m)','(n)','(o)'))
+          plt.orange_sponge,plt.num.corella,plt.clam, ncol=5)+
+          plot_annotation(tag_levels = 'a')
 
 fig.2
 
-ggplot2::ggsave("C:Data//For submission//For resubmission//RESUB2//First look//Fig2_resized.tiff", width=8.75, height=4.75, units="in")
+ggplot2::ggsave(plot=fig.2, "C:Data//For submission//For resubmission//RESUB2//First look//Fig2_resized.tiff", width=8.75, height=4.75, units="in")
 
-ggplot2::ggsave("C:Data//For submission//For resubmission//Fig2.png", width=65, height=35, units="cm")
+#ggplot2::ggsave("C:Data//For submission//For resubmission//Fig2.png", width=65, height=35, units="cm")
 
 
 # Pulling model results to a table ----------------------------------------
@@ -1629,11 +1598,11 @@ plt.richness <- ggplot(ndata.richness, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = richness, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Species richness")+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.richness,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")+ylim(0,20)
+  theme(legend.position='none')+ylim(0,20)
 plt.richness
 ggsave("C:Data//Graphs March 2020//richness_pred.png")
 
@@ -1690,11 +1659,11 @@ plt.evenness <- ggplot(ndata.evenness, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = evenness, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Species evenness")+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.evenness,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.evenness
 ggsave("C:Data//Graphs March 2020//evenness_pred.png")
 
@@ -1759,11 +1728,11 @@ plt.occupied.space <- ggplot(ndata.occupied.space, aes(x = min.10.pH.unscaled, y
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = occupied.space.001, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Proportion of space on tile occupied")+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.occupied.space,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.occupied.space
 ggsave("C:Data//Graphs March 2020//occupied.space_pred.png")
 
@@ -1828,11 +1797,11 @@ plt.everything.wet.weight <- ggplot(ndata.everything.wet.weight, aes(x = min.10.
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = log(everything.wet.weight), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Total wet biomass per mesocosm\n(g, log scale)")+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.everything.wet.weight,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.everything.wet.weight
 ggsave("C:Data//Graphs March 2020//everything.wet.weight_pred.png")
 
@@ -1895,11 +1864,11 @@ plt.everything.wet.weight.per.1 <- ggplot(ndata.everything.wet.weight.per.1, aes
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = log(everything.wet.weight.per.1), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Log Biomass per 1 % cover \n(wet weight)")+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.everything.wet.weight.per.1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.everything.wet.weight.per.1
 ggsave("C:Data//Graphs March 2020//everything.wet.weight.per.1_pred.png")
 
@@ -1965,11 +1934,11 @@ plt.total_dry_biomass <- ggplot(ndata.total_dry_biomass, aes(x = min.10.pH.unsca
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = (total_dry_biomass), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Total dry biomass per tile (g)")+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.total_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.total_dry_biomass
 ggplot2::ggsave("C:Data//Graphs March 2020//total_dry_biomass_pred.png")
 
@@ -2035,11 +2004,11 @@ plt.total_dry_biomass_per1 <- ggplot(ndata.total_dry_biomass_per1, aes(x = min.1
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = (total_dry_biomass_per1), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Total dry biomass per tile (g)")+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.total_dry_biomass_per1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.total_dry_biomass_per1
 ggplot2::ggsave("C:Data//Graphs March 2020//total_dry_biomass_per1_pred.png")
 
@@ -2098,11 +2067,11 @@ plt.hydroid_dry_biomass <- ggplot(ndata.hydroid_dry_biomass, aes(x = min.10.pH.u
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = (hydroid_dry_biomass+0.01), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(italic("Obelia") ~ "dry weight per tile (g)"))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.hydroid_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.hydroid_dry_biomass
 ggplot2::ggsave("C:Data//Graphs March 2020//hydroid_dry_biomass_pred.png")
 
@@ -2167,11 +2136,11 @@ plt.tunicate_dry_biomass <- ggplot(ndata.tunicate_dry_biomass, aes(x = min.10.pH
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = (tunicate_dry_biomass+0.01), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(italic("Botryllus") ~ "dry weight per tile (g)"))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.tunicate_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.tunicate_dry_biomass
 ggplot2::ggsave("C:Data//Graphs March 2020//tunicate_dry_biomass_pred.png")
 
@@ -2228,11 +2197,11 @@ plt.caprellid_dry_biomass <- ggplot(ndata.caprellid_dry_biomass, aes(x = min.10.
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = (caprellid_dry_biomass+0.01), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(italic("Caprella") ~ "dry weight per tile (g)"))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.caprellid_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.caprellid_dry_biomass
 ggplot2::ggsave("C:Data//Graphs March 2020//caprellid_dry_biomass_pred.png")
 
@@ -2296,11 +2265,11 @@ plt.caprellid_dry_biomass_per1 <- ggplot(ndata.caprellid_dry_biomass_per1, aes(x
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = (caprellid_dry_biomass_per1), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(italic("Caprella") ~ "dry weight per tile (g)"))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.caprellid_dry_biomass_per1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")+ylim(0,0.012)
+  theme(legend.position='none')+ylim(0,0.012)
 plt.caprellid_dry_biomass_per1
 ggplot2::ggsave("C:Data//Graphs March 2020//caprellid_dry_biomass_per1_pred.png")
 
@@ -2362,11 +2331,11 @@ plt.rest_dry_biomass <- ggplot(ndata.rest_dry_biomass, aes(x = min.10.pH.unscale
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = (rest_dry_biomass+0.01), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression("Remaining dry weight per tile (g)"))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.rest_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.rest_dry_biomass
 ggplot2::ggsave("C:Data//Graphs March 2020//rest_dry_biomass_pred.png")
 
@@ -2431,11 +2400,11 @@ plt.Mussel.wet.weight <- ggplot(ndata.Mussel.wet.weight, aes(x = min.10.pH.unsca
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = log(Mussel.wet.weight+0.1), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(italic("Mytilus") ~"wet weight (g, log scale)"))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.Mussel.wet.weight,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.Mussel.wet.weight
 ggsave("C:Data//Graphs March 2020//Mussel.wet.weight_pred.png")
 
@@ -2504,11 +2473,11 @@ plt.Mussel.wet.weight.per.1 <- ggplot(ndata.Mussel.wet.weight.per.1, aes(x = min
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = Mussel.wet.weight.per.1, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Biomass per mussel \n(wet weight)")+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.Mussel.wet.weight.per.1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.Mussel.wet.weight.per.1
 ggsave("C:Data//Graphs March 2020//Mussel.wet.weight.per.1_pred.png")
 
@@ -2585,11 +2554,11 @@ plt.gam.hydtobot <- ggplot(ndata.hydtobot, aes(x = min.10.pH.unscaled, y = fit))
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = hydtobot, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(italic("Botryllus")~ "to" ~ italic("Obelia") ~ "cover ratio"))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.hydtobot,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")+ geom_hline(yintercept=0.5, linetype="dashed", color="black", size=1)+coord_cartesian(ylim = c(0, 1)) 
+  theme(legend.position='none')+ geom_hline(yintercept=0.5, linetype="dashed", color="black", size=1)+coord_cartesian(ylim = c(0, 1)) 
 plt.gam.hydtobot 
 
 
@@ -2657,11 +2626,11 @@ plt.gam.hydtobot_dry_biomass <- ggplot(ndata.hydtobot_dry_biomass, aes(x = min.1
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y = hydtobot_dry_biomass, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(italic("Botryllus")~ "to" ~ italic("Obelia") ~ "biomass ratio"))+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.hydtobot_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")+ geom_hline(yintercept=0.5, linetype="dashed", color="black", size=1)#+coord_cartesian(ylim = c(0, 1)) 
+  theme(legend.position='none')+ geom_hline(yintercept=0.5, linetype="dashed", color="black", size=1)#+coord_cartesian(ylim = c(0, 1)) 
 plt.gam.hydtobot_dry_biomass 
 
 
@@ -2722,11 +2691,11 @@ plt.CAP1 <- ggplot(ndata.CAP1, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y =(CAP1), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Partial-dbRDA axis 1\n(36% of constrained variation)")+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.CAP1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.CAP1
 ggsave("C:Data//Graphs March 2020//CAP1_pred.png")
 
@@ -2790,11 +2759,11 @@ plt.distances <- ggplot(ndata.distances, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_line(aes(colour=oFood.quality)) +
   geom_point(aes(y =(distcentroid), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Heterogeneity of multivariate dispersions\n(distance to multivariate centroid)")+  
-  scale_color_manual(values=colorset2)+
-  scale_fill_manual(values=colorset2)+
-  scale_shape_manual(values=c(19,17))+
+  scale_color_manual(values=colorset2, guide = guide_legend(title="Food supplement", title.position = "top"))+
+  scale_fill_manual(values=colorset2, guide = FALSE)+
+  scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.distances,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
+  theme(legend.position='none')
 plt.distances
 ggsave("C:Data//Graphs March 2020//distances_pred.png")
 
