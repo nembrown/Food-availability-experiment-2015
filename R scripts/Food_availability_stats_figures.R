@@ -145,6 +145,14 @@ food.caprellid.data_zscores$Food.quality<-factor(food.caprellid.data_zscores$Foo
 # see https://www.fromthebottomoftheheap.net/2017/12/14/difference-splines-ii/
 
 
+
+# Plotting settings -------------------------------------------------------
+
+colorset2 = c("High"="#F8A02E" ,"Low"="#439E5F","None"= "#666666")
+theme_set(theme_classic(base_size = 6)) 
+
+
+
 # GAM beta hydroid / gam.beta.hydroid.12 --------------------------------------------------------
 
 #distributions - binomial or beta with various families
@@ -159,9 +167,9 @@ AICtab(gam.beta.hydroid.12, gam.beta.hydroid.12.1, gam.beta.hydroid.12.2, gam.be
 #cauchit is the best
 
 plot(gam.beta.hydroid.12.3, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.beta.hydroid.12.3)
-qq_plot(gam.beta.hydroid.12.3, method = 'simulate')
-k.check(gam.beta.hydroid.12.3)
+#appraise(gam.beta.hydroid.12.3)
+#qq_plot(gam.beta.hydroid.12.3, method = 'simulate')
+#k_check(gam.beta.hydroid.12.3)
 
 gam.beta.hydroid.12.3.unordered<- gam(hydroid.001~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality), data = food.exp.data.12.2019_zscores, family = betar(link="logit"), select=TRUE, method="REML")
 summary(gam.beta.hydroid.12.3)
@@ -202,21 +210,18 @@ ndata.hydroid <- mutate(ndata.hydroid,
 #make sure pH is unscaled in the plot
 ndata.hydroid$min.10.pH.unscaled<-ndata.hydroid$min.10.pH * attr(food.exp.data.12.2019_zscores$min.10.pH, 'scaled:scale') + attr(food.exp.data.12.2019_zscores$min.10.pH, 'scaled:center')
 
-# plot 
-colorset2 = c("High"="#F8A02E" ,"Low"="#439E5F","None"= "#666666")
 
 plt.gam.hydroid <- ggplot(ndata.hydroid, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = hydroid.001, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(italic("Obelia")~ "abundance", paste("(proportion cover)"))))+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = hydroid.001, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Obelia")~ "abundance"), textstyle("(proportion cover)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.hydroid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.gam.hydroid 
-ggsave("C:Data//Graphs December 2019//hydroid_pred.png")
+ggsave("C:Data//Graphs March 2020//hydroid_pred.png")
 
 
 
@@ -236,9 +241,9 @@ AICtab(gam.beta.alive.bot.12, gam.beta.alive.bot.12.1, gam.beta.alive.bot.12.2, 
 #cauchit is the best
 
 plot(gam.beta.alive.bot.12.3, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.beta.alive.bot.12.3)
-qq_plot(gam.beta.alive.bot.12.3, method = 'simulate')
-k.check(gam.beta.alive.bot.12.3)
+#appraise(gam.beta.alive.bot.12.3)
+#qq_plot(gam.beta.alive.bot.12.3, method = 'simulate')
+#k_check(gam.beta.alive.bot.12.3)
 summary(gam.beta.alive.bot.12.3)
 
 gam.beta.alive.bot.12.3.unordered<- gam(alive.bot.001~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality), data = food.exp.data.12.2019_zscores, family = betar(link="cloglog"), select=TRUE, REML=TRUE)
@@ -277,17 +282,17 @@ ndata.alive.bot$min.10.pH.unscaled<-ndata.alive.bot$min.10.pH * attr(food.exp.da
 # plot 
 
 plt.alive.bot <- ggplot(ndata.alive.bot, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = alive.bot.001, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(italic("Botryllus")~ "abundance", paste("(proportion cover)"))))+  
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = alive.bot.001, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Botryllus")~ "abundance"), textstyle("(proportion cover)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.alive.bot,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.alive.bot
-ggsave("C:Data//Graphs December 2019//alive.bot_pred.png")
+ggsave("C:Data//Graphs March 2020//alive.bot_pred.png")
 
 
 
@@ -304,10 +309,10 @@ gam.log.lm.caprellid.12<- gam(log(total.caprellids+1) ~ s(min.10.pH)+ oFood.qual
 AICtab(gam.lm.caprellid.12, gam.log.lm.caprellid.12, gam.nb.caprellid.12.1,gam.nb.caprellid.12, gam.poisson.caprellid.12)
 #gam.log.lm.caprellid.12 by far the best
 
-appraise(gam.log.lm.caprellid.12)
-qq_plot(gam.log.lm.caprellid.12, method = 'simulate')
+#appraise(gam.log.lm.caprellid.12)
+#qq_plot(gam.log.lm.caprellid.12, method = 'simulate')
 plot(gam.log.lm.caprellid.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-k.check(gam.log.lm.caprellid.12)
+#k_check(gam.log.lm.caprellid.12)
 summary(gam.log.lm.caprellid.12.unordered)
 
 gam.log.lm.caprellid.12.unordered<- gam(log(total.caprellids+1) ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.caprellid.data_zscores, select=TRUE, method="REML")
@@ -345,10 +350,10 @@ ndata.caprellid$min.10.pH.unscaled<-ndata.caprellid$min.10.pH * attr(food.caprel
 
 # plot 
 plt.caprellid <- ggplot(ndata.caprellid, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = log(total.caprellids+1), shape=CO2, colour=oFood.quality), size=3, data = food.caprellid.data_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(italic("Caprella")~ "abundance", paste("(Log # of individuals)"))))+  
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = log(total.caprellids+1), shape=CO2, colour=oFood.quality), data = food.caprellid.data_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Caprella")~ "abundance"), textstyle("(Log # of individuals)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
@@ -356,7 +361,7 @@ plt.caprellid <- ggplot(ndata.caprellid, aes(x = min.10.pH.unscaled, y = fit)) +
   theme(legend.position="none")
 plt.caprellid
 
-ggsave("C:Data//Graphs December 2019//caprellid_pred.png")
+ggsave("C:Data//Graphs March 2020//caprellid_pred.png")
 
 
 # GAM caprellid percent -----------------------------------------------------------
@@ -376,10 +381,10 @@ AICtab(gam.beta.caprellid.percent.12, gam.beta.caprellid.percent.12.1, gam.beta.
 
 plot(gam.beta.caprellid.percent.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
 
-appraise(gam.beta.caprellid.percent.12)
-qq_plot(gam.beta.caprellid.percent.12, method = 'simulate')
+#appraise(gam.beta.caprellid.percent.12)
+#qq_plot(gam.beta.caprellid.percent.12, method = 'simulate')
 #does not look great
-k.check(gam.beta.caprellid.percent.12)
+#k_check(gam.beta.caprellid.percent.12)
 summary(gam.beta.caprellid.percent.12.unordered)
 
 gam.beta.caprellid.percent.12.unordered<- gam(caprellid.percent.001~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality), data = food.exp.data.12.2019_zscores, family = betar(link="logit"), select=TRUE, method="REML")
@@ -417,17 +422,17 @@ ndata.caprellid.percent$min.10.pH.unscaled<-ndata.caprellid.percent$min.10.pH * 
 # plot 
 
 plt.caprellid.percent <- ggplot(ndata.caprellid.percent, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = caprellid.percent.001, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(italic("Caprella")~ "abundance", paste("(proportion cover)"))))+  
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = caprellid.percent.001, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Caprella")~ "abundance"), textstyle("(proportion cover)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.caprellid.percent,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.caprellid.percent
-ggsave("C:Data//Graphs December 2019//caprellid.percent_pred.png")
+ggsave("C:Data//Graphs March 2020//caprellid.percent_pred.png")
 
 
 
@@ -445,9 +450,9 @@ AICtab(gam.beta.formicula.12, gam.beta.formicula.12.1, gam.beta.formicula.12.2,g
 
 
 plot(gam.beta.formicula.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.beta.formicula.12)
-qq_plot(gam.beta.formicula.12, method = 'simulate')
-k.check(gam.beta.formicula.12)
+#appraise(gam.beta.formicula.12)
+#qq_plot(gam.beta.formicula.12, method = 'simulate')
+#k_check(gam.beta.formicula.12)
 summary(gam.beta.formicula.12)
 
 gam.beta.formicula.12.unordered<- gam(formicula.001~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality), data = food.exp.data.12.2019_zscores, family = betar(link="logit"), select=TRUE, method="REML")
@@ -485,17 +490,17 @@ ndata.formicula$min.10.pH.unscaled<-ndata.formicula$min.10.pH * attr(food.exp.da
 # plot 
 
 plt.formicula <- ggplot(ndata.formicula, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = formicula.001, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(italic("Folliculina")~ "abundance", paste("(proportion cover)"))))+  
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = formicula.001, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Folliculina")~ "abundance"), textstyle("(proportion cover)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.formicula,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.formicula
-ggsave("C:Data//Graphs December 2019//formicula_pred.png")
+ggsave("C:Data//Graphs March 2020//formicula_pred.png")
 
 
 
@@ -516,9 +521,9 @@ AICtab( gam.beta.alive.mem.12, gam.beta.alive.mem.12.1, gam.beta.alive.mem.12.2,
 
 
 plot(gam.beta.alive.mem.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.beta.alive.mem.12)
-qq_plot(gam.beta.alive.mem.12, method = 'simulate')
-k.check(gam.beta.alive.mem.12)
+#appraise(gam.beta.alive.mem.12)
+#qq_plot(gam.beta.alive.mem.12, method = 'simulate')
+#k_check(gam.beta.alive.mem.12)
 summary(gam.beta.alive.mem.12)
 vis.gam(gam.beta.alive.mem.12)
 
@@ -555,17 +560,17 @@ ndata.alive.mem$min.10.pH.unscaled<-ndata.alive.mem$min.10.pH * attr(food.exp.da
 # plot 
 
 plt.alive.mem <- ggplot(ndata.alive.mem, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = alive.mem.001, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(italic("Membranipora")~ "abundance", paste("(proportion cover)"))))+  
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = alive.mem.001, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Membranipora")~ "abundance"), textstyle("(proportion cover)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.alive.mem,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.alive.mem
-ggsave("C:Data//Graphs December 2019//alive.mem_pred.png")
+ggsave("C:Data//Graphs March 2020//alive.mem_pred.png")
 
 
 # GAM beta didemnum / gam.beta.didemnum.12 ------------------------------------------------------------
@@ -584,10 +589,10 @@ AICtab(gam.beta.didemnum.12, gam.beta.didemnum.12.1, gam.beta.didemnum.12.2,  ga
 #logit, all the betas are equal go with logit
 
 plot(gam.beta.didemnum.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.beta.didemnum.12)
-qq_plot(gam.beta.didemnum.12, method = 'simulate')
+#appraise(gam.beta.didemnum.12)
+#qq_plot(gam.beta.didemnum.12, method = 'simulate')
 #not very good
-k.check(gam.beta.didemnum.12)
+#k_check(gam.beta.didemnum.12)
 summary(gam.beta.didemnum.12)
 vis.gam(gam.beta.didemnum.12)
 
@@ -626,17 +631,17 @@ ndata.didemnum$min.10.pH.unscaled<-ndata.didemnum$min.10.pH * attr(food.exp.data
 # plot 
 
 plt.didemnum <- ggplot(ndata.didemnum, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = didemnum.001, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(italic("Didemnum")~ "abundance", paste("(proportion cover)"))))+  
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = didemnum.001, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Didemnum")~ "abundance"), textstyle("(proportion cover)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.didemnum,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.didemnum
-ggsave("C:Data//Graphs December 2019//didemnum_pred.png")
+ggsave("C:Data//Graphs March 2020//didemnum_pred.png")
 
 
 
@@ -667,10 +672,10 @@ AICtab(gam.nb.mussel_complete.12, glm.nb.mussel_complete.12.hydrogen, gam.nb.mus
 
 
 plot(gam.nb.mussel_complete.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.nb.mussel_complete.12)
-qq_plot(gam.nb.mussel_complete.12, method = 'simulate')
+#appraise(gam.nb.mussel_complete.12)
+#qq_plot(gam.nb.mussel_complete.12, method = 'simulate')
 #looks good!
-k.check(gam.nb.mussel_complete.12)
+#k_check(gam.nb.mussel_complete.12)
 summary(gam.nb.mussel_complete.12)
 
 
@@ -706,17 +711,17 @@ ndata.mussel_complete$min.10.pH.unscaled<-ndata.mussel_complete$min.10.pH * attr
 # plot 
 
 plt.mussel_complete <- ggplot(ndata.mussel_complete, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = mussel_complete, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(italic("Mytilus")~ "abundance", paste("(# of individuals)"))))+  
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = mussel_complete, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Mytilus")~ "abundance"), textstyle("(# of individuals)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.mussel_complete,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.mussel_complete
-ggsave("C:Data//Graphs December 2019//mussel_complete_pred.png")
+ggsave("C:Data//Graphs March 2020//mussel_complete_pred.png")
 
 
 # GAM negbin barnacles / gam.nb.num.barn.alive.12 -----------------------------------------------------------
@@ -733,10 +738,10 @@ gam.poisson.num.barn.alive.12<- gam(num.barn.alive ~ s(min.10.pH)+ oFood.quality
 AICtab(gam.nb.num.barn.alive.12, glm.nb.num.barn.alive.12.hydrogen, gam.nb.num.barn.alive.12.1, gam.poisson.num.barn.alive.12)
 
 plot(gam.nb.num.barn.alive.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.nb.num.barn.alive.12)
-qq_plot(gam.nb.num.barn.alive.12, method = 'simulate')
+#appraise(gam.nb.num.barn.alive.12)
+#qq_plot(gam.nb.num.barn.alive.12, method = 'simulate')
 #looks really good
-k.check(gam.nb.num.barn.alive.12)
+#k_check(gam.nb.num.barn.alive.12)
 summary(gam.nb.num.barn.alive.12)
 
 
@@ -780,17 +785,17 @@ ndata.num.barn.alive$min.10.pH.unscaled<-ndata.num.barn.alive$min.10.pH * attr(f
 
 # plot 
 plt.num.barn.alive <- ggplot(ndata.num.barn.alive, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = num.barn.alive, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(italic("Balanus")~ "abundance", paste("(# of individuals)"))))+  
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = num.barn.alive, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Balanus")~ "abundance"), textstyle("(# of individuals)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.num.barn.alive,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.num.barn.alive
-ggsave("C:Data//Graphs December 2019//num.barn.alive_pred.png")
+ggsave("C:Data//Graphs March 2020//num.barn.alive_pred.png")
 
 
 
@@ -808,10 +813,10 @@ AICtab(gam.nb.disporella.12.1,gam.nb.disporella.12,gam.poisson.disporella.12)
 #used estimated theta
 
 plot(gam.nb.disporella.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.nb.disporella.12)
+#appraise(gam.nb.disporella.12)
 #not bad!
-qq_plot(gam.nb.disporella.12, method = 'simulate')
-k.check(gam.nb.disporella.12)
+#qq_plot(gam.nb.disporella.12, method = 'simulate')
+#k_check(gam.nb.disporella.12)
 summary(gam.nb.disporella.12)
 
 #a few outside the area
@@ -855,17 +860,17 @@ ndata.disporella$min.10.pH.unscaled<-ndata.disporella$min.10.pH * attr(food.exp.
 
 # plot 
 plt.disporella <- ggplot(ndata.disporella, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = disporella, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(italic("Disporella")~ "abundance", paste("(# of colonies)"))))+  
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = disporella, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Disporella")~ "abundance"), textstyle("(# of colonies)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.disporella,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.disporella
-ggsave("C:Data//Graphs December 2019//disporella_pred.png")
+ggsave("C:Data//Graphs March 2020//disporella_pred.png")
 
 
 # GAM negbin schizo / gam.nb.schizo.12 --------------------------------------------------------------
@@ -882,10 +887,10 @@ AICtab(gam.nb.schizo.12, gam.nb.schizo.12.1, gam.poisson.schizo.12)
 
 
 plot(gam.nb.schizo.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.nb.schizo.12)
+#appraise(gam.nb.schizo.12)
 #looks pretty good
-qq_plot(gam.nb.schizo.12, method = 'simulate')
-k.check(gam.nb.schizo.12)
+#qq_plot(gam.nb.schizo.12, method = 'simulate')
+#k_check(gam.nb.schizo.12)
 summary(gam.nb.schizo.12)
 
 gam.nb.schizo.12.unordered<- gam(schizo ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = negbin(nbinom12.schizo$estimate[[1]]), select=TRUE, method="REML")
@@ -927,17 +932,17 @@ ndata.schizo$min.10.pH.unscaled<-ndata.schizo$min.10.pH * attr(food.exp.data.12.
 
 # plot 
 plt.schizo <- ggplot(ndata.schizo, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = schizo, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(italic("Schizoporella")~ "abundance", paste("(# of colonies)"))))+  
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = schizo, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Schizoporella")~ "abundance"), textstyle("(# of colonies)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.schizo,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.schizo
-ggsave("C:Data//Graphs December 2019//schizo_pred.png")
+ggsave("C:Data//Graphs March 2020//schizo_pred.png")
 
 
 # GAM poisson num nudi / gam.poisson.num.nudi.12  ------------------------------------------------------------
@@ -953,11 +958,11 @@ AICtab(gam.nb.num.nudi.12, gam.nb.num.nudi.12.1, gam.poisson.num.nudi.12)
 ###poisson is the best fit by 2 dAIC
 
 
-appraise(gam.poisson.num.nudi.12)
-qq_plot(gam.poisson.num.nudi.12, method = 'simulate')
+#appraise(gam.poisson.num.nudi.12)
+#qq_plot(gam.poisson.num.nudi.12, method = 'simulate')
 #looks quite good!
 plot(gam.poisson.num.nudi.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-k.check(gam.poisson.num.nudi.12)
+#k_check(gam.poisson.num.nudi.12)
 summary(gam.poisson.num.nudi.12)
 #resids a bit funny but same in neg bin
 
@@ -992,17 +997,17 @@ ndata.num.nudi$min.10.pH.unscaled<-ndata.num.nudi$min.10.pH * attr(food.exp.data
 
 # plot 
 plt.num.nudi <- ggplot(ndata.num.nudi, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = num.nudi, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(italic("Hermissenda")~ "abundance", paste("(# of individuals)"))))+  
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = num.nudi, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Hermissenda")~ "abundance"), textstyle("(# of individuals)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.num.nudi,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.num.nudi
-ggsave("C:Data//Graphs December 2019//num.nudi_pred.png")
+ggsave("C:Data//Graphs March 2020//num.nudi_pred.png")
 
 
 # GAM nb() serpulids / gam.nb.num.serpulid.12.1 -----------------------------------------------------------
@@ -1020,11 +1025,11 @@ AICtab(gam.nb.num.serpulid.12, gam.nb.num.serpulid.12.1, gam.poisson.num.serpuli
 
 ##gam.nb.num.serpulid.12.1 is best
 
-appraise(gam.nb.num.serpulid.12.1)
-qq_plot(gam.nb.num.serpulid.12.1, method = 'simulate')
+#appraise(gam.nb.num.serpulid.12.1)
+#qq_plot(gam.nb.num.serpulid.12.1, method = 'simulate')
 #looks good
 plot(gam.nb.num.serpulid.12.1, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-k.check(gam.nb.num.serpulid.12.1)
+#k_check(gam.nb.num.serpulid.12.1)
 summary(gam.nb.num.serpulid.12.1)
 
 #residuals a bit weird .... but they are the same in glm as in gam (doesn't improve)
@@ -1064,49 +1069,49 @@ ndata.num.serpulid$min.10.pH.unscaled<-ndata.num.serpulid$min.10.pH * attr(food.
 
 # plot 
 plt.num.serpulid <- ggplot(ndata.num.serpulid, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = num.serpulid, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop("Serpulid abundance", paste("(# of individuals)"))))+  
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = num.serpulid, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle("Serpulid abundance"), textstyle("(# of individuals)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.num.serpulid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.num.serpulid
-ggsave("C:Data//Graphs December 2019//num.serpulid_pred.png")
+ggsave("C:Data//Graphs March 2020//num.serpulid_pred.png")
 
-colorset2 = c("High"="#F8A02E" ,"Low"="#439E5F","None"= "#666666")
-colorset_none = c("High"="#FFFFFF" ,"Low"="#FFFFFF","None"= "#666666")
-colorset_low = c("High"="#FFFFFF" ,"Low"="#439E5F","None"= "#666666")
-
-### Plot for powerpoint:
-plt.num.serpulid <- ggplot(ndata.num.serpulid, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = num.serpulid, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop("Serpulid abundance", paste("(# of individuals)"))))+  
-  scale_color_manual(values=colorset_none)+
-  scale_fill_manual(values=colorset_none)+
-  scale_shape_manual(values=c(19,17))+
-  geom_ribbon(data = ndata.num.serpulid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
-plt.num.serpulid
-ggsave("C:Data//Graphs December 2019//num.serpulid_pred_none.png")
-
-plt.num.serpulid <- ggplot(ndata.num.serpulid, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = num.serpulid, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop("Serpulid abundance", paste("(# of individuals)"))))+  
-  scale_color_manual(values=colorset_low)+
-  scale_fill_manual(values=colorset_low)+
-  scale_shape_manual(values=c(19,17))+
-  geom_ribbon(data = ndata.num.serpulid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
-  theme(legend.position="none")
-plt.num.serpulid
-ggsave("C:Data//Graphs December 2019//num.serpulid_pred_low.png")
-
+# colorset2 = c("High"="#F8A02E" ,"Low"="#439E5F","None"= "#666666")
+# colorset_none = c("High"="#FFFFFF" ,"Low"="#FFFFFF","None"= "#666666")
+# colorset_low = c("High"="#FFFFFF" ,"Low"="#439E5F","None"= "#666666")
+# 
+# ### Plot for powerpoint:
+# plt.num.serpulid <- ggplot(ndata.num.serpulid, aes(x = min.10.pH.unscaled, y = fit)) + 
+#   
+#   geom_line(aes(colour=oFood.quality)) +
+#   geom_point(aes(y = num.serpulid, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+#   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle("Serpulid abundance"), textstyle("(# of individuals)")))))+  
+#   scale_color_manual(values=colorset_none)+
+#   scale_fill_manual(values=colorset_none)+
+#   scale_shape_manual(values=c(19,17))+
+#   geom_ribbon(data = ndata.num.serpulid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
+#   theme(legend.position="none")
+# plt.num.serpulid
+# ggsave("C:Data//Graphs March 2020//num.serpulid_pred_none.png")
+# 
+# plt.num.serpulid <- ggplot(ndata.num.serpulid, aes(x = min.10.pH.unscaled, y = fit)) + 
+#   
+#   geom_line(aes(colour=oFood.quality)) +
+#   geom_point(aes(y = num.serpulid, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+#   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle("Serpulid abundance"), textstyle("(# of individuals)")))))+  
+#   scale_color_manual(values=colorset_low)+
+#   scale_fill_manual(values=colorset_low)+
+#   scale_shape_manual(values=c(19,17))+
+#   geom_ribbon(data = ndata.num.serpulid,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
+#   theme(legend.position="none")
+# plt.num.serpulid
+# ggsave("C:Data//Graphs March 2020//num.serpulid_pred_low.png")
+# 
 # GAM negbin orange sponge / gam.nb.orange_sponge.12 -------------------------------------------------------
 
 nbinom12.orange_sponge <- fitdistr(food.exp.data.12.2019_zscores$orange_sponge, "Negative Binomial")
@@ -1121,11 +1126,11 @@ AICtab(gam.nb.orange_sponge.12, gam.nb.orange_sponge.12.1,  gam.poisson.orange_s
 
 ###.12
 
-appraise(gam.nb.orange_sponge.12)
+#appraise(gam.nb.orange_sponge.12)
 #a bit funnel-y
-qq_plot(gam.nb.orange_sponge.12, method = 'simulate')
+#qq_plot(gam.nb.orange_sponge.12, method = 'simulate')
 plot(gam.nb.orange_sponge.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-k.check(gam.nb.orange_sponge.12)
+#k_check(gam.nb.orange_sponge.12)
 summary(gam.nb.orange_sponge.12)
 
 gam.nb.orange_sponge.12.unordered<- gam(orange_sponge ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = negbin(nbinom12.orange_sponge$estimate[[1]]), select=TRUE, method="REML")
@@ -1160,17 +1165,16 @@ ndata.orange_sponge$min.10.pH.unscaled<-ndata.orange_sponge$min.10.pH * attr(foo
 
 # plot 
 plt.orange_sponge <- ggplot(ndata.orange_sponge, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = orange_sponge, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop("Sponge abundance", paste("(# of individuals)"))))+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = orange_sponge, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle("Sponge abundance"), textstyle("(# of individuals)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.orange_sponge,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.orange_sponge
-ggsave("C:Data//Graphs December 2019//orange_sponge_pred.png")
+ggsave("C:Data//Graphs March 2020//orange_sponge_pred.png")
 
 
 
@@ -1187,11 +1191,11 @@ gam.poisson.num.corella.12<- gam(num.corella ~ s(min.10.pH)+ oFood.quality + s(m
 AICtab(gam.nb.num.corella.12, gam.nb.num.corella.12.1, gam.poisson.num.corella.12)
 #.12
 
-appraise(gam.nb.num.corella.12)
+#appraise(gam.nb.num.corella.12)
 #looks pretty good - slight pattern
-qq_plot(gam.nb.num.corella.12, method = 'simulate')
+#qq_plot(gam.nb.num.corella.12, method = 'simulate')
 plot(gam.nb.num.corella.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-k.check(gam.nb.num.corella.12)
+#k_check(gam.nb.num.corella.12)
 summary(gam.nb.num.corella.12)
 
 
@@ -1223,19 +1227,19 @@ ndata.num.corella <- mutate(ndata.num.corella,
 
 ndata.num.corella$min.10.pH.unscaled<-ndata.num.corella$min.10.pH * attr(food.exp.data.12.2019_zscores$min.10.pH, 'scaled:scale') + attr(food.exp.data.12.2019_zscores$min.10.pH, 'scaled:center')
 
+par(lheight=0.2) 
 # plot 
 plt.num.corella <- ggplot(ndata.num.corella, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = num.corella, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
-  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(italic("Corella")~ "abundance", paste("(# of individuals)"))))+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = num.corella, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
+  xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(atop(NA,atop(textstyle(italic("Corella")~ "abundance"), textstyle("(# of individuals)")))))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17))+
   geom_ribbon(data = ndata.num.corella,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.num.corella
-ggsave("C:Data//Graphs December 2019//num.corella_pred.png")
+ggsave("C:Data//Graphs March 2020//num.corella_pred.png")
 
 
 
@@ -1254,10 +1258,10 @@ AICtab(gam.nb.clam.12, gam.nb.clam.12.1, gam.poisson.clam.12)
 
 ###gam poisson is best
 
-appraise(gam.poisson.clam.12)
-qq_plot(gam.poisson.clam.12, method = 'simulate')
+#appraise(gam.poisson.clam.12)
+#qq_plot(gam.poisson.clam.12, method = 'simulate')
 plot(gam.poisson.clam.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-k.check(gam.poisson.clam.12)
+#k_check(gam.poisson.clam.12)
 summary(gam.poisson.clam.12)
 
 #residuals a bit patterny as well 
@@ -1295,9 +1299,9 @@ ndata.clam$min.10.pH.unscaled<-ndata.clam$min.10.pH * attr(food.exp.data.12.2019
 
 # plot 
 plt.clam <- ggplot(ndata.clam, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = clam, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = clam, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Clam abundance\n(# of individuals)")+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -1305,7 +1309,7 @@ plt.clam <- ggplot(ndata.clam, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.clam,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.clam
-ggsave("C:Data//Graphs December 2019//clam_pred.png")
+ggsave("C:Data//Graphs March 2020//clam_pred.png")
 
 
 ### legend plot
@@ -1316,33 +1320,40 @@ par(xpd = NA, # switch off clipping, necessary to always see axis labels
 ) 
 
 plt.legend <- ggplot(ndata.clam, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = clam, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = clam, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Clam abundance\n(# of individuals)")+  
   scale_color_manual(values=colorset2, name = "Food supplementation", labels = c("None", "Low-quality", "High-quality"))+
   scale_fill_manual(values=colorset2)+
   scale_shape_manual(values=c(19,17), name = "pH", labels = c("Ambient", "Low pH"))+
   guides(color = guide_legend(order = 2), shape = guide_legend(order = 1), fill = FALSE)+
-  geom_ribbon(data = ndata.clam,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)
+  geom_ribbon(data = ndata.clam,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
+  theme(legend.position='bottom', 
+        legend.justification='right',
+        legend.direction='horizontal')+
+  theme(plot.margin = unit(c(0, 0, 0, 3), "in"))
 plt.legend 
 
-legend_food <- get_legend(plt.legend + theme(legend.position="bottom"))
+legend_food <- get_legend(plt.legend)
+
+
+
+
+plot(legend_food)
 
 # Fig 2 plot generation ---------------------------------------------------
-
-
-library(cowplot)
+library(patchwork)
 fig.2<-plot_grid(plt.gam.hydroid,plt.alive.bot,plt.formicula,plt.caprellid.percent,plt.alive.mem,plt.didemnum,
           plt.mussel_complete,plt.num.barn.alive,plt.disporella,plt.schizo,plt.num.nudi,plt.num.serpulid,
-          plt.orange_sponge,plt.num.corella,plt.clam,legend_food, ncol=5, rel_heights = c(1,1,1,.2), align='v', axis = 'l', 
+          plt.orange_sponge,plt.num.corella,plt.clam,legend_food, ncol=5, rel_heights = c(1,1,1,.2),label_size=7,axis='l', align='v',
           labels=c('(a)', '(b)','(c)', '(d)', '(e)', '(f)', '(g)', 
-                   '(h)', '(i)', '(j)','(k)','(l)','(m)','(n)','(o)', ''))
+                   '(h)', '(i)', '(j)','(k)','(l)','(m)','(n)','(o)'))
 
 fig.2
 
-ggplot2::ggsave("C:Data//For submission//For resubmission//Fig2.png", width=65, height=35, units="cm")
+ggplot2::ggsave("C:Data//For submission//For resubmission//RESUB2//First look//Fig2_resized.tiff", width=8.75, height=4.75, units="in")
 
+ggplot2::ggsave("C:Data//For submission//For resubmission//Fig2.png", width=65, height=35, units="cm")
 
 
 # Pulling model results to a table ----------------------------------------
@@ -1564,7 +1575,7 @@ pstable %>%
   group_rows("Sponge, negative binomial", 37, 39) %>% 
   group_rows("Corella, negative binomial", 40, 42) %>% 
   group_rows("Clams, poisson", 43, 45) %>% 
-  save_kable(file = "C:Data//For submission//For resubmission//pstable.html", self_contained = T)
+  save_kable(file = "C:Data//For submission//For resubmission//RESUB2//First look//pstable.html", self_contained = T)
 
 
 # Richness ----------------------------------------------------------------
@@ -1574,10 +1585,10 @@ gam.poisson.richness.12<- gam(richness ~ s(min.10.pH)+ oFood.quality + s(min.10.
 AICtab(gam.nb.richness.12.1, gam.poisson.richness.12)
 
 plot(gam.poisson.richness.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.poisson.richness.12)
+#appraise(gam.poisson.richness.12)
 #okay but qq plot not the best on ends
-qq_plot(gam.poisson.richness.12, method = 'simulate')
-k.check(gam.poisson.richness.12)
+#qq_plot(gam.poisson.richness.12, method = 'simulate')
+#k_check(gam.poisson.richness.12)
 summary(gam.poisson.richness.12)
 #a few outside the QQ plot on both ends
 #low p value for k - but NS and edf is not super close to k-index
@@ -1614,9 +1625,9 @@ ndata.richness$min.10.pH.unscaled<-ndata.richness$min.10.pH * attr(food.exp.data
 
 # plot 
 plt.richness <- ggplot(ndata.richness, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = richness, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = richness, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Species richness")+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -1624,7 +1635,7 @@ plt.richness <- ggplot(ndata.richness, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.richness,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")+ylim(0,20)
 plt.richness
-ggsave("C:Data//Graphs December 2019//richness_pred.png")
+ggsave("C:Data//Graphs March 2020//richness_pred.png")
 
 
 
@@ -1640,10 +1651,10 @@ gam.gamma.evenness.12.1<- gam(evenness ~ s(min.10.pH)+ oFood.quality + s(min.10.
 AICtab( gam.lm.evenness.12, gam.gamma.evenness.12.1)
 
 plot(gam.lm.evenness.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.lm.evenness.12)
+#appraise(gam.lm.evenness.12)
 #looks very good
-qq_plot(gam.lm.evenness.12, method = 'simulate')
-k.check(gam.lm.evenness.12)
+#qq_plot(gam.lm.evenness.12, method = 'simulate')
+#k_check(gam.lm.evenness.12)
 summary(gam.lm.evenness.12)
 
 gam.lm.evenness.12.unordered<- gam(evenness ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
@@ -1675,9 +1686,9 @@ ndata.evenness$min.10.pH.unscaled<-ndata.evenness$min.10.pH * attr(food.exp.data
 
 # plot 
 plt.evenness <- ggplot(ndata.evenness, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = evenness, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = evenness, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Species evenness")+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -1685,7 +1696,7 @@ plt.evenness <- ggplot(ndata.evenness, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.evenness,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.evenness
-ggsave("C:Data//Graphs December 2019//evenness_pred.png")
+ggsave("C:Data//Graphs March 2020//evenness_pred.png")
 
 
 # Occupied space ----------------------------------------------------------
@@ -1703,10 +1714,10 @@ AICtab(gam.lm.occupied.space.12, gam.beta.occupied.space.12.3, gam.gamma.occupie
 #beta cauchit is best 
 
 plot(gam.beta.occupied.space.12.3, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.beta.occupied.space.12.3)
+#appraise(gam.beta.occupied.space.12.3)
 #a bit blocky
-qq_plot(gam.beta.occupied.space.12.3, method = 'simulate')
-k.check(gam.beta.occupied.space.12.3)
+#qq_plot(gam.beta.occupied.space.12.3, method = 'simulate')
+#k_check(gam.beta.occupied.space.12.3)
 #k gettinga bit low but ns
 summary(gam.beta.occupied.space.12.3)
 gam.beta.occupied.space.12.3.unordered<- gam(occupied.space.001~ s(min.10.pH, k=15)+ Food.quality + s(min.10.pH, by=oFood.quality, k=15), data = food.exp.data.12.2019_zscores, family = betar(link="logit"), select=TRUE, method="REML")
@@ -1744,9 +1755,9 @@ ndata.occupied.space$min.10.pH.unscaled<-ndata.occupied.space$min.10.pH * attr(f
 
 # plot 
 plt.occupied.space <- ggplot(ndata.occupied.space, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = occupied.space.001, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = occupied.space.001, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Proportion of space on tile occupied")+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -1754,7 +1765,7 @@ plt.occupied.space <- ggplot(ndata.occupied.space, aes(x = min.10.pH.unscaled, y
   geom_ribbon(data = ndata.occupied.space,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.occupied.space
-ggsave("C:Data//Graphs December 2019//occupied.space_pred.png")
+ggsave("C:Data//Graphs March 2020//occupied.space_pred.png")
 
 
 
@@ -1773,10 +1784,10 @@ AICtab(gam.loglink.everything.wet.weight.12.1, gam.lm.log.everything.wet.weight.
 
 
 plot(gam.lm.log.everything.wet.weight.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.lm.log.everything.wet.weight.12)
+#appraise(gam.lm.log.everything.wet.weight.12)
 #Looks quite good
-qq_plot(gam.lm.log.everything.wet.weight.12, method = 'simulate')
-k.check(gam.lm.log.everything.wet.weight.12)
+#qq_plot(gam.lm.log.everything.wet.weight.12, method = 'simulate')
+#k_check(gam.lm.log.everything.wet.weight.12)
 summary(gam.lm.log.everything.wet.weight.12)
 
 gam.lm.log.everything.wet.weight.12.unordered<- gam(log(everything.wet.weight) ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
@@ -1813,9 +1824,9 @@ ndata.everything.wet.weight$min.10.pH.unscaled<-ndata.everything.wet.weight$min.
 
 # plot 
 plt.everything.wet.weight <- ggplot(ndata.everything.wet.weight, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = log(everything.wet.weight), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = log(everything.wet.weight), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Total wet biomass per mesocosm\n(g, log scale)")+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -1823,7 +1834,7 @@ plt.everything.wet.weight <- ggplot(ndata.everything.wet.weight, aes(x = min.10.
   geom_ribbon(data = ndata.everything.wet.weight,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.everything.wet.weight
-ggsave("C:Data//Graphs December 2019//everything.wet.weight_pred.png")
+ggsave("C:Data//Graphs March 2020//everything.wet.weight_pred.png")
 
 
 # Everything wet weight per 1 ---------------------------------------------
@@ -1841,10 +1852,10 @@ AICtab(gam.loglink.everything.wet.weight.per.1.12.1, gam.lm.log.everything.wet.w
 
 
 plot(gam.lm.log.everything.wet.weight.per.1.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.lm.log.everything.wet.weight.per.1.12)
+#appraise(gam.lm.log.everything.wet.weight.per.1.12)
 #good but mabe a bit funnelly
-qq_plot(gam.lm.log.everything.wet.weight.per.1.12, method = 'simulate')
-k.check(gam.lm.log.everything.wet.weight.per.1.12)
+#qq_plot(gam.lm.log.everything.wet.weight.per.1.12, method = 'simulate')
+#k_check(gam.lm.log.everything.wet.weight.per.1.12)
 summary(gam.lm.log.everything.wet.weight.per.1.12)
 
 gam.lm.log.everything.wet.weight.per.1.12.unordered<- gam(log(everything.wet.weight.per.1) ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
@@ -1880,9 +1891,9 @@ ndata.everything.wet.weight.per.1$min.10.pH.unscaled<-ndata.everything.wet.weigh
 
 # plot 
 plt.everything.wet.weight.per.1 <- ggplot(ndata.everything.wet.weight.per.1, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = log(everything.wet.weight.per.1), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = log(everything.wet.weight.per.1), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Log Biomass per 1 % cover \n(wet weight)")+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -1890,7 +1901,7 @@ plt.everything.wet.weight.per.1 <- ggplot(ndata.everything.wet.weight.per.1, aes
   geom_ribbon(data = ndata.everything.wet.weight.per.1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.everything.wet.weight.per.1
-ggsave("C:Data//Graphs December 2019//everything.wet.weight.per.1_pred.png")
+ggsave("C:Data//Graphs March 2020//everything.wet.weight.per.1_pred.png")
 
 
 
@@ -1909,10 +1920,10 @@ AICtab(gam.loglink.total_dry_biomass.12.1, gam.lm.log.total_dry_biomass.12, gam.
 
 
 plot(gam.lm.total_dry_biomass.12 , shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.lm.total_dry_biomass.12 )
+#appraise(gam.lm.total_dry_biomass.12 )
 #Looks v good
-qq_plot(gam.lm.total_dry_biomass.12 , method = 'simulate')
-k.check(gam.lm.total_dry_biomass.12 )
+#qq_plot(gam.lm.total_dry_biomass.12 , method = 'simulate')
+#k_check(gam.lm.total_dry_biomass.12 )
 summary(gam.lm.total_dry_biomass.12 )
 
 gam.lm.total_dry_biomass.12.unordered<- gam(total_dry_biomass ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
@@ -1950,9 +1961,9 @@ ndata.total_dry_biomass$min.10.pH.unscaled<-ndata.total_dry_biomass$min.10.pH * 
 
 # plot 
 plt.total_dry_biomass <- ggplot(ndata.total_dry_biomass, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = (total_dry_biomass), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = (total_dry_biomass), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Total dry biomass per tile (g)")+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -1960,7 +1971,7 @@ plt.total_dry_biomass <- ggplot(ndata.total_dry_biomass, aes(x = min.10.pH.unsca
   geom_ribbon(data = ndata.total_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.total_dry_biomass
-ggplot2::ggsave("C:Data//Graphs December 2019//total_dry_biomass_pred.png")
+ggplot2::ggsave("C:Data//Graphs March 2020//total_dry_biomass_pred.png")
 
 
 # Dry weight per 1 % cover --------------------------------------------------------------
@@ -1977,11 +1988,11 @@ AICtab(gam.loglink.total_dry_biomass_per1.12.1, gam.lm.log.total_dry_biomass_per
 #tweedie is best by 1.7
 
 plot(gam.tweedie.total_dry_biomass_per1.12 , shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.tweedie.total_dry_biomass_per1.12 )
+#appraise(gam.tweedie.total_dry_biomass_per1.12 )
 #not available for tweedie
-qq_plot(gam.tweedie.total_dry_biomass_per1.12 , method = 'simulate')
+#qq_plot(gam.tweedie.total_dry_biomass_per1.12 , method = 'simulate')
 #looks good
-k.check(gam.tweedie.total_dry_biomass_per1.12 )
+#k_check(gam.tweedie.total_dry_biomass_per1.12 )
 summary(gam.tweedie.total_dry_biomass_per1.12 )
 
 gam.tweedie.total_dry_biomass_per1.12.unordered<- gam(total_dry_biomass_per1 ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=Food.quality),data = food.exp.data.12.2019_zscores, family = tw, select=TRUE, method="REML")
@@ -2020,9 +2031,9 @@ ndata.total_dry_biomass_per1$min.10.pH.unscaled<-ndata.total_dry_biomass_per1$mi
 
 # plot 
 plt.total_dry_biomass_per1 <- ggplot(ndata.total_dry_biomass_per1, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = (total_dry_biomass_per1), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = (total_dry_biomass_per1), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Total dry biomass per tile (g)")+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -2030,7 +2041,7 @@ plt.total_dry_biomass_per1 <- ggplot(ndata.total_dry_biomass_per1, aes(x = min.1
   geom_ribbon(data = ndata.total_dry_biomass_per1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.total_dry_biomass_per1
-ggplot2::ggsave("C:Data//Graphs December 2019//total_dry_biomass_per1_pred.png")
+ggplot2::ggsave("C:Data//Graphs March 2020//total_dry_biomass_per1_pred.png")
 
 # hydroid biomass ---------------------------------------------------------
 
@@ -2044,10 +2055,10 @@ AICtab(gam.loglink.hydroid_dry_biomass.12, gam.lm.log.hydroid_dry_biomass.12, ga
 
 #gamma is best 
 plot(gam.gamma.hydroid_dry_biomass.12 , shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.gamma.hydroid_dry_biomass.12 )
+#appraise(gam.gamma.hydroid_dry_biomass.12 )
 #looks good, maybe slightly funnelly
-qq_plot(gam.gamma.hydroid_dry_biomass.12 , method = 'simulate')
-k.check(gam.gamma.hydroid_dry_biomass.12 )
+#qq_plot(gam.gamma.hydroid_dry_biomass.12 , method = 'simulate')
+#k_check(gam.gamma.hydroid_dry_biomass.12 )
 summary(gam.gamma.hydroid_dry_biomass.12 )
 
 gam.gamma.hydroid_dry_biomass.12.unordered<- gam(hydroid_dry_biomass+0.1 ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = Gamma, select=TRUE, method="REML")
@@ -2083,9 +2094,9 @@ ndata.hydroid_dry_biomass$min.10.pH.unscaled<-ndata.hydroid_dry_biomass$min.10.p
 
 # plot 
 plt.hydroid_dry_biomass <- ggplot(ndata.hydroid_dry_biomass, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = (hydroid_dry_biomass+0.01), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = (hydroid_dry_biomass+0.01), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(italic("Obelia") ~ "dry weight per tile (g)"))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -2093,7 +2104,7 @@ plt.hydroid_dry_biomass <- ggplot(ndata.hydroid_dry_biomass, aes(x = min.10.pH.u
   geom_ribbon(data = ndata.hydroid_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.hydroid_dry_biomass
-ggplot2::ggsave("C:Data//Graphs December 2019//hydroid_dry_biomass_pred.png")
+ggplot2::ggsave("C:Data//Graphs March 2020//hydroid_dry_biomass_pred.png")
 
 
 
@@ -2113,10 +2124,10 @@ AICtab(gam.loglink.tunicate_dry_biomass.12, gam.lm.log.tunicate_dry_biomass.12, 
 #gamma is the best
 
 plot(gam.gamma.tunicate_dry_biomass.12 , shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.gamma.tunicate_dry_biomass.12 )
+#appraise(gam.gamma.tunicate_dry_biomass.12 )
 #a bit patterny
-qq_plot(gam.gamma.tunicate_dry_biomass.12 , method = 'simulate')
-k.check(gam.gamma.tunicate_dry_biomass.12 )
+#qq_plot(gam.gamma.tunicate_dry_biomass.12 , method = 'simulate')
+#k_check(gam.gamma.tunicate_dry_biomass.12 )
 summary(gam.gamma.tunicate_dry_biomass.12 )
 
 gam.gamma.tunicate_dry_biomass.12.unordered<- gam(tunicate_dry_biomass+0.1 ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = Gamma, select=TRUE, method="REML")
@@ -2152,9 +2163,9 @@ ndata.tunicate_dry_biomass$min.10.pH.unscaled<-ndata.tunicate_dry_biomass$min.10
 
 # plot 
 plt.tunicate_dry_biomass <- ggplot(ndata.tunicate_dry_biomass, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = (tunicate_dry_biomass+0.01), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = (tunicate_dry_biomass+0.01), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(italic("Botryllus") ~ "dry weight per tile (g)"))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -2162,7 +2173,7 @@ plt.tunicate_dry_biomass <- ggplot(ndata.tunicate_dry_biomass, aes(x = min.10.pH
   geom_ribbon(data = ndata.tunicate_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.tunicate_dry_biomass
-ggplot2::ggsave("C:Data//Graphs December 2019//tunicate_dry_biomass_pred.png")
+ggplot2::ggsave("C:Data//Graphs March 2020//tunicate_dry_biomass_pred.png")
 
 
 
@@ -2178,10 +2189,10 @@ AICtab(gam.loglink.caprellid_dry_biomass.12, gam.lm.log.caprellid_dry_biomass.12
 #gamma by 1.2
 
 plot(gam.gamma.caprellid_dry_biomass.12 , shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.gamma.caprellid_dry_biomass.12 )
+#appraise(gam.gamma.caprellid_dry_biomass.12 )
 # look good
-qq_plot(gam.gamma.caprellid_dry_biomass.12 , method = 'simulate')
-k.check(gam.gamma.caprellid_dry_biomass.12 )
+#qq_plot(gam.gamma.caprellid_dry_biomass.12 , method = 'simulate')
+#k_check(gam.gamma.caprellid_dry_biomass.12 )
 summary(gam.gamma.caprellid_dry_biomass.12 )
 gam.gamma.caprellid_dry_biomass.12.unordered<- gam(caprellid_dry_biomass+0.1 ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = Gamma, select=TRUE, method="REML")
 
@@ -2213,9 +2224,9 @@ ndata.caprellid_dry_biomass$min.10.pH.unscaled<-ndata.caprellid_dry_biomass$min.
 
 # plot 
 plt.caprellid_dry_biomass <- ggplot(ndata.caprellid_dry_biomass, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = (caprellid_dry_biomass+0.01), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = (caprellid_dry_biomass+0.01), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(italic("Caprella") ~ "dry weight per tile (g)"))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -2223,7 +2234,7 @@ plt.caprellid_dry_biomass <- ggplot(ndata.caprellid_dry_biomass, aes(x = min.10.
   geom_ribbon(data = ndata.caprellid_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.caprellid_dry_biomass
-ggplot2::ggsave("C:Data//Graphs December 2019//caprellid_dry_biomass_pred.png")
+ggplot2::ggsave("C:Data//Graphs March 2020//caprellid_dry_biomass_pred.png")
 
 
 
@@ -2242,10 +2253,10 @@ AICtab(gam.loglink.caprellid_dry_biomass_per1.12, gam.lm.log.caprellid_dry_bioma
 
 #gamma is the best by 2.2
 plot(gam.gamma.caprellid_dry_biomass_per1.12 , shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.gamma.caprellid_dry_biomass_per1.12 )
+#appraise(gam.gamma.caprellid_dry_biomass_per1.12 )
 #a bit funnelly and qq right tail
-qq_plot(gam.gamma.caprellid_dry_biomass_per1.12 , method = 'simulate')
-k.check(gam.gamma.caprellid_dry_biomass_per1.12 )
+#qq_plot(gam.gamma.caprellid_dry_biomass_per1.12 , method = 'simulate')
+#k_check(gam.gamma.caprellid_dry_biomass_per1.12 )
 summary(gam.gamma.caprellid_dry_biomass_per1.12 )
 gam.gamma.caprellid_dry_biomass_per1.12.unordered<- gam(caprellid_dry_biomass_per1+0.1 ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = Gamma, select=TRUE, method="REML")
 
@@ -2281,9 +2292,9 @@ ndata.caprellid_dry_biomass_per1$min.10.pH.unscaled<-ndata.caprellid_dry_biomass
 
 # plot 
 plt.caprellid_dry_biomass_per1 <- ggplot(ndata.caprellid_dry_biomass_per1, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = (caprellid_dry_biomass_per1), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = (caprellid_dry_biomass_per1), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(italic("Caprella") ~ "dry weight per tile (g)"))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -2291,7 +2302,7 @@ plt.caprellid_dry_biomass_per1 <- ggplot(ndata.caprellid_dry_biomass_per1, aes(x
   geom_ribbon(data = ndata.caprellid_dry_biomass_per1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")+ylim(0,0.012)
 plt.caprellid_dry_biomass_per1
-ggplot2::ggsave("C:Data//Graphs December 2019//caprellid_dry_biomass_per1_pred.png")
+ggplot2::ggsave("C:Data//Graphs March 2020//caprellid_dry_biomass_per1_pred.png")
 
 
 # rest biomass ------------------------------------------------------------
@@ -2310,8 +2321,8 @@ AICtab(gam.loglink.rest_dry_biomass.12, gam.lm.log.rest_dry_biomass.12, gam.twee
 
 
 plot(gam.tweedie.rest_dry_biomass.12 , shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-qq_plot(gam.tweedie.rest_dry_biomass.12 , method = 'simulate')
-k.check(gam.tweedie.rest_dry_biomass.12 )
+#qq_plot(gam.tweedie.rest_dry_biomass.12 , method = 'simulate')
+#k_check(gam.tweedie.rest_dry_biomass.12 )
 summary(gam.tweedie.rest_dry_biomass.12)
 
 gam.tweedie.rest_dry_biomass.12.unordered<- gam(rest_dry_biomass+0.1 ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = Gamma, select=TRUE, method="REML")
@@ -2347,9 +2358,9 @@ ndata.rest_dry_biomass$min.10.pH.unscaled<-ndata.rest_dry_biomass$min.10.pH * at
 
 # plot 
 plt.rest_dry_biomass <- ggplot(ndata.rest_dry_biomass, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = (rest_dry_biomass+0.01), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = (rest_dry_biomass+0.01), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression("Remaining dry weight per tile (g)"))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -2357,7 +2368,7 @@ plt.rest_dry_biomass <- ggplot(ndata.rest_dry_biomass, aes(x = min.10.pH.unscale
   geom_ribbon(data = ndata.rest_dry_biomass,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.rest_dry_biomass
-ggplot2::ggsave("C:Data//Graphs December 2019//rest_dry_biomass_pred.png")
+ggplot2::ggsave("C:Data//Graphs March 2020//rest_dry_biomass_pred.png")
 
 
 
@@ -2376,10 +2387,10 @@ AICtab(gam.loglink.Mussel.wet.weight.12.1, gam.lm.log.Mussel.wet.weight.12, gam.
 #gam.lm.log.Mussel.wet.weight.12 is best 
 
 plot(gam.lm.log.Mussel.wet.weight.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.lm.log.Mussel.wet.weight.12)
+#appraise(gam.lm.log.Mussel.wet.weight.12)
 #look pretty good, esp qq
-qq_plot(gam.lm.log.Mussel.wet.weight.12, method = 'simulate')
-k.check(gam.lm.log.Mussel.wet.weight.12)
+#qq_plot(gam.lm.log.Mussel.wet.weight.12, method = 'simulate')
+#k_check(gam.lm.log.Mussel.wet.weight.12)
 summary(gam.lm.log.Mussel.wet.weight.12)
 
 #residuals many in a straight line but otherwise good 
@@ -2416,9 +2427,9 @@ ndata.Mussel.wet.weight$min.10.pH.unscaled<-ndata.Mussel.wet.weight$min.10.pH * 
 
 # plot 
 plt.Mussel.wet.weight <- ggplot(ndata.Mussel.wet.weight, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = log(Mussel.wet.weight+0.1), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = log(Mussel.wet.weight+0.1), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(italic("Mytilus") ~"wet weight (g, log scale)"))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -2426,7 +2437,7 @@ plt.Mussel.wet.weight <- ggplot(ndata.Mussel.wet.weight, aes(x = min.10.pH.unsca
   geom_ribbon(data = ndata.Mussel.wet.weight,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.Mussel.wet.weight
-ggsave("C:Data//Graphs December 2019//Mussel.wet.weight_pred.png")
+ggsave("C:Data//Graphs March 2020//Mussel.wet.weight_pred.png")
 
 
 
@@ -2449,10 +2460,10 @@ AICtab(gam.loglink.Mussel.wet.weight.per.1.12.1, gam.lm.log.Mussel.wet.weight.pe
 
 #gamma is best 
 plot(gam.gamma.Mussel.wet.weight.per.1.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.gamma.Mussel.wet.weight.per.1.12)
+#appraise(gam.gamma.Mussel.wet.weight.per.1.12)
 # good but a bit funnelly
-qq_plot(gam.gamma.Mussel.wet.weight.per.1.12, method = 'simulate')
-k.check(gam.gamma.Mussel.wet.weight.per.1.12)
+#qq_plot(gam.gamma.Mussel.wet.weight.per.1.12, method = 'simulate')
+#k_check(gam.gamma.Mussel.wet.weight.per.1.12)
 summary(gam.gamma.Mussel.wet.weight.per.1.12)
 
 gam.gamma.Mussel.wet.weight.per.1.12.unordered<- gam(Mussel.wet.weight.per.1+0.01 ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = Gamma, select=TRUE, method="REML")
@@ -2489,9 +2500,9 @@ ndata.Mussel.wet.weight.per.1$min.10.pH.unscaled<-ndata.Mussel.wet.weight.per.1$
 
 # plot 
 plt.Mussel.wet.weight.per.1 <- ggplot(ndata.Mussel.wet.weight.per.1, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = Mussel.wet.weight.per.1, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = Mussel.wet.weight.per.1, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Biomass per mussel \n(wet weight)")+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -2499,7 +2510,7 @@ plt.Mussel.wet.weight.per.1 <- ggplot(ndata.Mussel.wet.weight.per.1, aes(x = min
   geom_ribbon(data = ndata.Mussel.wet.weight.per.1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.Mussel.wet.weight.per.1
-ggsave("C:Data//Graphs December 2019//Mussel.wet.weight.per.1_pred.png")
+ggsave("C:Data//Graphs March 2020//Mussel.wet.weight.per.1_pred.png")
 
 
 
@@ -2521,10 +2532,10 @@ AICtab( gam.tweedie.hydtobot.12 ,gam.beta.hydtobot.12, gam.lm.hydtobot.12, gam.l
 ### beta logit is the best 
 
 plot(gam.beta.hydtobot.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.beta.hydtobot.12)
+#appraise(gam.beta.hydtobot.12)
 #qq a bit wiggly
-qq_plot(gam.beta.hydtobot.12, method = 'simulate')
-k.check(gam.beta.hydtobot.12)
+#qq_plot(gam.beta.hydtobot.12, method = 'simulate')
+#k_check(gam.beta.hydtobot.12)
 gam.check(gam.tweedie.hydtobot.12)
 summary(gam.beta.hydtobot.12)
 #not the best qq plot
@@ -2570,9 +2581,9 @@ ndata.hydtobot$min.10.pH.unscaled<-ndata.hydtobot$min.10.pH * attr(food.exp.data
 # plot 
 
 plt.gam.hydtobot <- ggplot(ndata.hydtobot, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = hydtobot, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = hydtobot, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(italic("Botryllus")~ "to" ~ italic("Obelia") ~ "cover ratio"))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -2597,10 +2608,10 @@ AICtab(gam.tweedie.hydtobot_dry_biomass.12 ,gam.beta.hydtobot_dry_biomass.12, ga
 ### logit is the best 
 
 plot(gam.beta.hydtobot_dry_biomass.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.beta.hydtobot_dry_biomass.12)
+#appraise(gam.beta.hydtobot_dry_biomass.12)
 #look ok, qq is bloacky
-qq_plot(gam.beta.hydtobot_dry_biomass.12, method = 'simulate')
-k.check(gam.beta.hydtobot_dry_biomass.12)
+#qq_plot(gam.beta.hydtobot_dry_biomass.12, method = 'simulate')
+#k_check(gam.beta.hydtobot_dry_biomass.12)
 summary(gam.beta.hydtobot_dry_biomass.12)
 gam.beta.hydtobot_dry_biomass.12.unordered<- gam(hydtobot_dry_biomass~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality), data = food.exp.data.12.2019_zscores, family = betar(link="logit"), select=TRUE, method="REML")
 
@@ -2642,9 +2653,9 @@ ndata.hydtobot_dry_biomass$min.10.pH.unscaled<-ndata.hydtobot_dry_biomass$min.10
 # plot 
 
 plt.gam.hydtobot_dry_biomass <- ggplot(ndata.hydtobot_dry_biomass, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y = hydtobot_dry_biomass, shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y = hydtobot_dry_biomass, shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab(expression(italic("Botryllus")~ "to" ~ italic("Obelia") ~ "biomass ratio"))+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -2667,10 +2678,10 @@ AICtab( gam.loglink.CAP1.12.1, gam.lm.CAP1.12)
 #gam.lm.CAP1
 
 plot(gam.lm.CAP1.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.lm.CAP1.12)
+#appraise(gam.lm.CAP1.12)
 #look good
-qq_plot(gam.lm.CAP1.12, method = 'simulate')
-k.check(gam.lm.CAP1.12)
+#qq_plot(gam.lm.CAP1.12, method = 'simulate')
+#k_check(gam.lm.CAP1.12)
 summary(gam.lm.CAP1.12)
 gam.lm.CAP1.12.unordered<- gam(CAP1 ~ s(min.10.pH)+ Food.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, select=TRUE, method="REML")
 summary(gam.lm.CAP1.12.unordered)
@@ -2707,9 +2718,9 @@ ndata.CAP1$min.10.pH.unscaled<-ndata.CAP1$min.10.pH * attr(food.exp.data.12.2019
 
 # plot 
 plt.CAP1 <- ggplot(ndata.CAP1, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y =(CAP1), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y =(CAP1), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Partial-dbRDA axis 1\n(36% of constrained variation)")+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -2717,7 +2728,7 @@ plt.CAP1 <- ggplot(ndata.CAP1, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.CAP1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.CAP1
-ggsave("C:Data//Graphs December 2019//CAP1_pred.png")
+ggsave("C:Data//Graphs March 2020//CAP1_pred.png")
 
 
 # Distances ---------------------------------------------------------------
@@ -2733,10 +2744,10 @@ AICtab(gam.loglink.distances.12.1,  gam.lm.distances.12, gam.gamma.distances.12)
 
 
 plot(gam.lm.distances.12, shade = TRUE, pages = 1, scale = 0, seWithMean = TRUE)
-appraise(gam.lm.distances.12)
+#appraise(gam.lm.distances.12)
 #looks good
-qq_plot(gam.lm.distances.12, method = 'simulate')
-k.check(gam.lm.distances.12)
+#qq_plot(gam.lm.distances.12, method = 'simulate')
+#k_check(gam.lm.distances.12)
 #good now
 summary(gam.lm.distances.12)
 
@@ -2775,9 +2786,9 @@ ndata.distances$min.10.pH.unscaled<-ndata.distances$min.10.pH * attr(food.exp.da
 
 # plot 
 plt.distances <- ggplot(ndata.distances, aes(x = min.10.pH.unscaled, y = fit)) + 
-  theme_classic()+
-  geom_line(size=1.5, aes(colour=oFood.quality)) +
-  geom_point(aes(y =(distcentroid), shape=CO2, colour=oFood.quality), size=3, data = food.exp.data.12.2019_zscores)+
+  
+  geom_line(aes(colour=oFood.quality)) +
+  geom_point(aes(y =(distcentroid), shape=CO2, colour=oFood.quality), data = food.exp.data.12.2019_zscores)+
   xlab(expression("Minimum" ~"10"^"th"~"percentile pH")) + ylab("Heterogeneity of multivariate dispersions\n(distance to multivariate centroid)")+  
   scale_color_manual(values=colorset2)+
   scale_fill_manual(values=colorset2)+
@@ -2785,7 +2796,7 @@ plt.distances <- ggplot(ndata.distances, aes(x = min.10.pH.unscaled, y = fit)) +
   geom_ribbon(data = ndata.distances,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position="none")
 plt.distances
-ggsave("C:Data//Graphs December 2019//distances_pred.png")
+ggsave("C:Data//Graphs March 2020//distances_pred.png")
 
 # Community plotting ------------------------------------------------------
 library(cowplot)
@@ -2793,19 +2804,19 @@ library(cowplot)
 #### revised community fig
 fig.3.community<-plot_grid( plt.occupied.space,plt.total_dry_biomass,
                             plt.richness, plt.evenness,
-                            plt.CAP1, plt.distances,legend_food, ncol=2, rel_heights = c(1,1,1,.2),
-                            align='v', axis='l',
-                           labels=c('(a)', '(b)','(c)', '(d)', '(e)', '(f)'))
+                            plt.CAP1, plt.distances, legend_food, ncol=2, rel_heights = c(1,1,1,.2),
+                            align='v', axis='b',label_size=7,
+                           labels=c('(a)', '(b)','(c)', '(d)', '(e)', '(f)',''))
 
 fig.3.community
 
-ggplot2::ggsave("C:Data//For submission//For resubmission//Fig3.community.png", width=30, height=40, units="cm")
+ggplot2::ggsave("C:Data//For submission//For resubmission//RESUB2//First look//Fig3.community.tiff", width=6, height=8, units="in")
 
 
 
 #hyd tobot figs
-fig.s1.hydtobot<-plot_grid(plt.gam.hydtobot, plt.gam.hydtobot_dry_biomass, legend_food, 
-                           ncol=2, rel_heights = c(1,.2),align='v',axis = 'l', 
+fig.s1.hydtobot<-plot_grid(plt.gam.hydtobot, plt.gam.hydtobot_dry_biomass,legend_food, 
+                           ncol=2, rel_heights = c(1,.2),align='b',axis = 'l', 
                            labels=c('(a)', '(b)', ''))
 
 fig.s1.hydtobot
@@ -3031,4 +3042,4 @@ pstable.community %>%
   group_rows("Botryllus to Obelia dominance ratio by space, beta (Chi-square, z)", 19,21) %>% 
   group_rows("Botryllus to Obelia dominance ratio by biomass, beta (Chi-square, z)", 22,24) %>% 
   group_rows("Total wet biomass, normal (log)", 25,27) %>% 
-  save_kable(file = "C:Data//For submission//For resubmission//pstable.community.html", self_contained = T)
+  save_kable(file = "C:Data//For submission//For resubmission//pstable.community.html ", self_contained = T)
