@@ -44,8 +44,13 @@ library(installr)
 # dataframe management ----------------------------------------------------
 #wd is top of project, use here() to find path
 
+#data from inside the mesocosms:
 food.exp.data.12.2019<-read.csv("C:Data//Mesocosm inventory data//food.exp.data.mesocosm.12.csv")
+
+#data from the tiles:
 food.exp.data.tile.all<-read.csv("C:Data//Mesocosm inventory data//food.exp.data.tile.all.csv")
+
+#caprellid data:
 food.caprellid.data<-read.csv("C:Data//Emily caprellid data.csv", stringsAsFactors = FALSE, na.strings = c("NA","") )
 
 
