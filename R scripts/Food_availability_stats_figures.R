@@ -40,12 +40,6 @@ library(cowplot)
 library(devtools)
 library(installr)
 
-# uninstall.packages("betareg")
-# install.packages("Rcpp")
- # uninstall.packages("gratia")
-#  uninstall.packages("mgcv")
- #devtools::install_github('gavinsimpson/gratia')
-# install.packages("mgcv")
 
 # dataframe management ----------------------------------------------------
 #wd is top of project, use here() to find path
@@ -2785,11 +2779,11 @@ ggplot2::ggsave(plot=fig.4.community, "C:Data//For submission//For resubmission/
 
 
 #hyd tobot figs
-fig.s1.hydtobot<-wrap_plots(plt.gam.hydtobot, plt.gam.hydtobot_dry_biomass, ncol=2) + plot_annotation(tag_levels = 'a')
+fig.s3.hydtobot<-wrap_plots(plt.gam.hydtobot, plt.gam.hydtobot_dry_biomass, ncol=2) + plot_annotation(tag_levels = 'a')
 
-fig.s1.hydtobot
+fig.s3.hydtobot
 
-ggplot2::ggsave("C:Data//For submission//For resubmission//RESUB2//First look//Fig.S1.hydotobot.png", width=6, height=3, units="in")
+ggplot2::ggsave("C:Data//For submission//For resubmission//RESUB2//First look//Fig.S3.hydotobot.png", width=6, height=3, units="in")
 
 
 
