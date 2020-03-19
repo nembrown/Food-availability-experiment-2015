@@ -2696,7 +2696,6 @@ plt.CAP1 <- ggplot(ndata.CAP1, aes(x = min.10.pH.unscaled, y = fit)) +
   scale_shape_manual(values=c(19,17), labels=c("Ambient", "Low pH"), guide = guide_legend(title="pH treatment", title.position = "top"))+
   geom_ribbon(data = ndata.CAP1,aes(ymin = right_lwr, ymax = right_upr, fill=oFood.quality), alpha = 0.10)+
   theme(legend.position='bottom', legend.box='horizontal', legend.spacing=unit(0.2, "cm"), legend.margin=margin(0, 0, 0, 0, "cm"), legend.key.size = unit(0, "cm"), legend.text = element_text(size=6), legend.title = element_text(size=7))
-
 plt.CAP1
 ggsave("C:Data//Graphs March 2020//CAP1_pred.png")
 
