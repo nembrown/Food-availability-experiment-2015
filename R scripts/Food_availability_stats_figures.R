@@ -1319,7 +1319,7 @@ fig.2<-wrap_plots(plt.gam.hydroid,plt.alive.bot,plt.formicula,plt.caprellid.perc
 
 fig.2
 
-ggplot2::ggsave(plot=fig.2, "C:Data//For submission//For resubmission//RESUB2//First look//Fig2_resized.tiff", width=8.75, height=4.75, units="in")
+ggplot2::ggsave(plot=fig.2, "C:Data//For submission//For resubmission//RESUB2//First look//Fig2_resized.tiff", width=8.75, height=4.75, units="in", dpi=600)
 
 #ggplot2::ggsave("C:Data//For submission//For resubmission//Fig2.png", width=65, height=35, units="cm")
 
@@ -2779,7 +2779,7 @@ fig.4.community<-wrap_plots( plt.occupied.space,plt.total_dry_biomass,
 
 fig.4.community
 
-ggplot2::ggsave(plot=fig.4.community, "C:Data//For submission//For resubmission//RESUB2//First look//Fig4.community.tiff", width=3, height=4, units="in")
+ggplot2::ggsave(plot=fig.4.community, "C:Data//For submission//For resubmission//RESUB2//First look//Fig4.community.tiff", width=3, height=5, units="in", dpi=600)
 
 
 
@@ -2788,7 +2788,7 @@ fig.s3.hydtobot<-wrap_plots(plt.gam.hydtobot, plt.gam.hydtobot_dry_biomass, ncol
 
 fig.s3.hydtobot
 
-ggplot2::ggsave("C:Data//For submission//For resubmission//RESUB2//First look//Fig.S3.hydotobot.png", width=6, height=3, units="in")
+ggplot2::ggsave("C:Data//For submission//For resubmission//RESUB2//First look//Fig.S3.hydotobot.png", width=6, height=3, units="in", dpi=600)
 
 
 
