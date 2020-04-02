@@ -728,10 +728,10 @@ ggsave("C:Data//Graphs March 2020//mussel_complete_pred.png")
 
 
 nbinom12.barn.alive <- fitdistr(food.exp.data.12.2019_zscores$num.barn.alive, "Negative Binomial")
-qqp(food.exp.data.12.2019_zscores$num.barn.alive, "nbinom", size = nbinom12.barn.alive$estimate[[1]], mu = nbinom12.mussel$estimate[[2]])
+qqp(food.exp.data.12.2019_zscores$num.barn.alive, "nbinom", size = nbinom12.barn.alive$estimate[[1]], mu = nbinom12.barn.alive$estimate[[2]])
 
 #negative binomial 
-gam.nb.num.barn.alive.12<- gam(num.barn.alive ~ s(min.10.pH)+ oFood.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = negbin(nbinom12.barnacles$estimate[[1]]), select=TRUE, method="REML")
+gam.nb.num.barn.alive.12<- gam(num.barn.alive ~ s(min.10.pH)+ oFood.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = negbin(nbinom12.barn.alive$estimate[[1]]), select=TRUE, method="REML")
 gam.nb.num.barn.alive.12.1<- gam(num.barn.alive ~ s(min.10.pH)+ oFood.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = nb(), select=TRUE, method="REML")
 gam.poisson.num.barn.alive.12<- gam(num.barn.alive ~ s(min.10.pH)+ oFood.quality + s(min.10.pH, by=oFood.quality),data = food.exp.data.12.2019_zscores, family = poisson(), select=TRUE, method="REML")
 
